@@ -1,0 +1,17 @@
+server:
+  port: 8761
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+
+
+#spring:
+#  zipkin:
+#    baseUrl:
+#
+#
+#  sleuth:
+#    sampler:
+#      probability: 1
