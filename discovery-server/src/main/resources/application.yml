@@ -1,3 +1,14 @@
+#spring:
+#  application:
+#    name: discovery-server
+#  cloud:
+#    config:
+#      name: discovery-server
+#      uri: http://localhost:8080/config
+#  config:
+#    import: optional:configserver:http://localhost:8080/config
+
+
 server:
   port: 8761
 
