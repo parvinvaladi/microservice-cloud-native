@@ -21,8 +21,8 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "SKU_CODE")
-    private String skuCode;
+    @Column(name = "BOOK_ID")
+    private String bookId;
 
     @Column(name = "PRICE")
     private BigDecimal price;

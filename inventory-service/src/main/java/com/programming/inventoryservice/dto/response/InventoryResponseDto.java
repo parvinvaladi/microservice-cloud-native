@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record InventoryResponseDto(
-        String skuCode,
+        Long bookId,
         boolean isInStock
 ) {
 }

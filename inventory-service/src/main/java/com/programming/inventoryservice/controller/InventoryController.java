@@ -1,5 +1,6 @@
 package com.programming.inventoryservice.controller;
 
+import com.programming.inventoryservice.dto.InventoryDto;
 import com.programming.inventoryservice.dto.request.SaveToInventoryRequestDto;
 import com.programming.inventoryservice.dto.response.InventoryResponseDto;
 import com.programming.inventoryservice.service.InventoryService;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/inventory")
+@RequestMapping("/api/v1/inventory")
 public class InventoryController {
 
     private final InventoryService inventoryService;
@@ -26,9 +27,17 @@ public class InventoryController {
         return ResponseEntity.ok(inventoryService.saveToInventory(requestDto));
     }
 
+    @GetMapping(value = "/get-all")
+    @Operation(summary = "دریافت لیست کتاب ها")
+    ResponseEntity<List<InventoryDto>> getAll(@RequestParam Integer pageSize,@RequestParam Integer pageNumber){
+        return ResponseEntity.ok(inventoryService.getAll(pageSize,pageNumber));
+    }
+
+
     @GetMapping()
+    @Operation(summary = "وجود یا عدم وجود در انبار")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<InventoryResponseDto>> isInStock(@RequestParam List<String> skuCode){
-        return ResponseEntity.ok(inventoryService.isInStock(skuCode));
+    public ResponseEntity<List<InventoryResponseDto>> isInStock(@RequestParam List<Long> productId){
+        return ResponseEntity.ok(inventoryService.isInStock(productId));
     }
 }

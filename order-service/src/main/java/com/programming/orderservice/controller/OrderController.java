@@ -5,6 +5,7 @@ import com.programming.orderservice.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.CompletableFuture;
@@ -22,11 +23,11 @@ public class OrderController {
 //    @CircuitBreaker(name = "inventory",fallbackMethod = "fallbackMethod")
 //    @TimeLimiter(name = "inventory")
 //    @Retry(name = "inventory")
-    public CompletableFuture<String> saveOrder(@RequestBody OrderRequestDto requestDto){
-        return CompletableFuture.supplyAsync(()-> orderService.saveOrder(requestDto));
+    public ResponseEntity<String> saveOrder(@RequestBody OrderRequestDto requestDto){
+        return orderService.saveOrder(requestDto);
     }
 
-    public CompletableFuture<String> fallbackMethod(OrderRequestDto requestDto,RuntimeException exception){
-        return CompletableFuture.supplyAsync(()-> "something went wrong, please order after some time.");
-    }
+//    public CompletableFuture<String> fallbackMethod(OrderRequestDto requestDto,RuntimeException exception){
+//        return CompletableFuture.supplyAsync(()-> "something went wrong, please order after some time.");
+//    }
 }

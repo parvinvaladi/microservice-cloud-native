@@ -7,6 +7,8 @@ import com.programming.orderservice.dto.response.InventoryResponseDto;
 import com.programming.orderservice.domain.Order;
 import com.programming.orderservice.domain.OrderItem;
 import com.programming.orderservice.service.OrderService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -20,31 +22,39 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
-    private final WebClient.Builder webClientBuilder;
+
+    @Autowired
+    private WebClient webClient;
 
     private final KafkaTemplate kafkaTemplate;
 
-    public OrderServiceImpl(OrderRepository orderRepository, WebClient.Builder webClientBuilder, KafkaTemplate kafkaTemplate) {
+    public OrderServiceImpl(OrderRepository orderRepository, KafkaTemplate kafkaTemplate) {
         this.orderRepository = orderRepository;
-        this.webClientBuilder = webClientBuilder;
         this.kafkaTemplate = kafkaTemplate;
     }
 
     @Override
-    public String saveOrder(OrderRequestDto orderRequestDto) {
+    public ResponseEntity<String> saveOrder(OrderRequestDto orderRequestDto) {
         Order order = new Order();
         order.setOrderNumber(UUID.randomUUID().toString());
         List<OrderItem> orderItems= orderRequestDto.orderItemRequestDtos().stream().map(orderItemRequestDto ->
                         OrderItem.builder()
-                                .skuCode(orderItemRequestDto.skuCode())
+                                .bookId(orderItemRequestDto.skuCode())
                                 .price(orderItemRequestDto.price())
                                 .quantity(orderItemRequestDto.quantity())
                                 .build()
                 ).collect(Collectors.toList());
         order.setOrderItems(orderItems);
-        List<String> skuCodes = orderItems.stream().map(
-                orderItem -> orderItem.getSkuCode()
+        orderRepository.save(order);
+        List<String> bookIds = orderItems.stream().map(
+                orderItem -> orderItem.getBookId()
         ).collect(Collectors.toList());
+
+        InventoryResponseDto[] inventoryResponseDtos = webClient.get()
+                .uri("http://localhost:8081/v1/api/inventory",bookIds)
+                .retrieve()
+                .bodyToMono(InventoryResponseDto[].class)
+                .block();
 
 //        Span callInventoryService = tracer.nextSpan().name("callInventoryService");
 //
@@ -68,7 +78,7 @@ public class OrderServiceImpl implements OrderService {
 //            callInventoryService.end();
 //        }
 
-        return "";
+        return ResponseEntity.ok("");
 
     }
 }
