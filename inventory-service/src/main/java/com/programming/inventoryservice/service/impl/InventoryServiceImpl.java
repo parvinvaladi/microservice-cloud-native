@@ -9,6 +9,8 @@ import com.programming.inventoryservice.dto.response.InventoryResponseDto;
 import com.programming.inventoryservice.service.InventoryService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class InventoryServiceImpl implements InventoryService {
+
 
     private final InventoryRepository inventoryRepository;
     private InventoryMapper inventoryMapper;

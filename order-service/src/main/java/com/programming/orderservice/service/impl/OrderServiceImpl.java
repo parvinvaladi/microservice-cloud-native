@@ -46,16 +46,24 @@ public class OrderServiceImpl implements OrderService {
                 ).collect(Collectors.toList());
         order.setOrderItems(orderItems);
         orderRepository.save(order);
-        List<String> bookIds = orderItems.stream().map(
+        List<Long> bookId = orderItems.stream().map(
                 orderItem -> orderItem.getBookId()
         ).collect(Collectors.toList());
 
-        InventoryResponseDto[] inventoryResponseDtos = webClient.get()
-                .uri("http://localhost:8081/v1/api/inventory",bookIds)
+        List<InventoryResponseDto> inventoryResponseDtos = webClient.get()
+                .uri("http://localhost:8081/api/v1/inventory/is-in-stock?bookId={bookId}",bookId.toArray())
                 .retrieve()
-                .bodyToMono(InventoryResponseDto[].class)
-                .block();
+                .toEntityList(InventoryResponseDto.class)
+                .block().getBody();
 
+        inventoryResponseDtos.forEach(inventoryResponseDto -> {
+            if (inventoryResponseDto.isInStock()){
+                orderRepository.save(order);
+            }else {
+
+                throw new IllegalArgumentException("");
+            }
+        });
 //        Span callInventoryService = tracer.nextSpan().name("callInventoryService");
 //
 //        try(Tracer.SpanInScope spanInScope = tracer.withSpan(callInventoryService.start())){

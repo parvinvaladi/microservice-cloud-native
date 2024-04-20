@@ -22,7 +22,7 @@ public class OrderItem {
     private Long id;
 
     @Column(name = "BOOK_ID")
-    private String bookId;
+    private Long bookId;
 
     @Column(name = "PRICE")
     private BigDecimal price;
