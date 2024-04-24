@@ -7,7 +7,7 @@ import com.programming.inventoryservice.dto.response.InventoryResponseDto;
 import java.util.List;
 
 public interface InventoryService {
-    List<InventoryResponseDto> isInStock(List<Long> skuCode);
-    Void saveToInventory(SaveToInventoryRequestDto requestDto);
+    List<InventoryDto> isInStock(List<Long> skuCode);
+    Void saveToInventory(InventoryDto requestDto);
     List<InventoryDto> getAll(Integer pageSize, Integer pageNumber);
 }

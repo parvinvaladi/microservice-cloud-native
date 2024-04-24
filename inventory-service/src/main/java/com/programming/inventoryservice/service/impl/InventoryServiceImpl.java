@@ -19,8 +19,6 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class InventoryServiceImpl implements InventoryService {
-
-
     private final InventoryRepository inventoryRepository;
     private InventoryMapper inventoryMapper;
 
@@ -30,28 +28,23 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public List<InventoryResponseDto> isInStock(List<Long> bookId) {
-//        log.info("wait started");
+    public List<InventoryDto> isInStock(List<Long> bookId) {
+        log.info("wait started");
         try {
-            Thread.sleep(10000);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-//        log.info("wait ended");
-        return inventoryRepository.findAllById(bookId).stream().map(
-                inventory -> InventoryResponseDto.builder()
-                        .bookId(inventory.getPid())
-                        .isInStock(inventory.getQuantity() > 0)
-                        .build()
-        ).collect(Collectors.toList());
+        log.info("wait ended");
+        List<Inventory> inventoryList = inventoryRepository.findAllById(bookId);
+        // TODO: 21.04.24 add a check for quantity
+        List<InventoryDto> inventoryResponseDtoList = inventoryMapper.toDtos(inventoryList);
+        return inventoryResponseDtoList;
     }
 
     @Override
-    public Void saveToInventory(SaveToInventoryRequestDto requestDto) {
-        Inventory inventory = Inventory.builder()
-                .bookName(requestDto.bookName())
-                .quantity(requestDto.quantity())
-                .build();
+    public Void saveToInventory(InventoryDto requestDto) {
+        Inventory inventory = inventoryMapper.toEntity(requestDto);
         inventoryRepository.save(inventory);
         return null;
     }

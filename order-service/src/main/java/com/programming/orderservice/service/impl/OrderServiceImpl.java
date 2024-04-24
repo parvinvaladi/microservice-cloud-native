@@ -7,7 +7,9 @@ import com.programming.orderservice.dto.response.InventoryResponseDto;
 import com.programming.orderservice.domain.Order;
 import com.programming.orderservice.domain.OrderItem;
 import com.programming.orderservice.service.OrderService;
+import jakarta.ws.rs.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -39,13 +41,12 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderNumber(UUID.randomUUID().toString());
         List<OrderItem> orderItems= orderRequestDto.orderItemRequestDtos().stream().map(orderItemRequestDto ->
                         OrderItem.builder()
-                                .bookId(orderItemRequestDto.skuCode())
+                                .bookId(orderItemRequestDto.bookId())
                                 .price(orderItemRequestDto.price())
                                 .quantity(orderItemRequestDto.quantity())
                                 .build()
                 ).collect(Collectors.toList());
         order.setOrderItems(orderItems);
-        orderRepository.save(order);
         List<Long> bookId = orderItems.stream().map(
                 orderItem -> orderItem.getBookId()
         ).collect(Collectors.toList());
@@ -56,37 +57,15 @@ public class OrderServiceImpl implements OrderService {
                 .toEntityList(InventoryResponseDto.class)
                 .block().getBody();
 
-        inventoryResponseDtos.forEach(inventoryResponseDto -> {
-            if (inventoryResponseDto.isInStock()){
+        boolean allBooksInStock = inventoryResponseDtos.stream().allMatch(InventoryResponseDto::isInStock);
+
+            if (allBooksInStock){
                 orderRepository.save(order);
-            }else {
-
-                throw new IllegalArgumentException("");
-            }
-        });
-//        Span callInventoryService = tracer.nextSpan().name("callInventoryService");
-//
-//        try(Tracer.SpanInScope spanInScope = tracer.withSpan(callInventoryService.start())){
-//            InventoryResponseDto[] inventoryResponseDtos = webClientBuilder.build().get()
-//                    .uri("http://inventory-service/api/inventory",
-//                            uriBuilder -> uriBuilder.queryParam("skuCode",skuCodes).build())
-//                    .retrieve()
-//                    .bodyToMono(InventoryResponseDto[].class)
-//                    .block();
-//
-//            boolean allProductInStock = Arrays.stream(inventoryResponseDtos).allMatch(InventoryResponseDto::isInStock);
-//            if (allProductInStock){
-//                orderRepository.save(order);
 //                kafkaTemplate.send("notificationTopic", new OrderPlacedEvent(order.getOrderNumber()));
-//                return "order replaced successfully";
-//            }else {
-//                throw new IllegalArgumentException("product is not in stock");
-//            }
-//        }finally {
-//            callInventoryService.end();
-//        }
-
-        return ResponseEntity.ok("");
+                return ResponseEntity.ok("");
+            }else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not all books in stock");
+            }
 
     }
 }

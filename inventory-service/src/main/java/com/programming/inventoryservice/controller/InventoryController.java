@@ -28,7 +28,7 @@ public class InventoryController {
 
     @PostMapping(value = "/save")
     @Operation(summary = "‌خیره در فهرست محصولات")
-    public ResponseEntity saveToInventory(@RequestBody SaveToInventoryRequestDto requestDto){
+    public ResponseEntity saveToInventory(@RequestBody InventoryDto requestDto){
         return ResponseEntity.ok(inventoryService.saveToInventory(requestDto));
     }
 
@@ -42,7 +42,8 @@ public class InventoryController {
     @GetMapping(value = "/is-in-stock")
     @Operation(summary = "وجود یا عدم وجود در انبار")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<InventoryResponseDto>> isInStock(@RequestParam List<Long> bookId){
+    public ResponseEntity<List<InventoryDto>> isInStock(@RequestParam List<Long> bookId){
+        log.info("bookId: {}",bookId);
         return ResponseEntity.ok(inventoryService.isInStock(bookId));
     }
 }
