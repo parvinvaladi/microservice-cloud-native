@@ -1,11 +1,11 @@
-package com.programming.orderservice.dto.response;
+package com.programming.inventoryservice.dto.response;
 
 import lombok.Builder;
 
 import java.util.List;
 
 @Builder
-public record InventoryResponseDto(
+public record IsInStockResponseDto(
         List<Long> bookIds,
         List<String> bookNames,
         List<Boolean> isInStock

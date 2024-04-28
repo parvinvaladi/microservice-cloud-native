@@ -1,5 +1,9 @@
 package com.programming.inventoryservice.controller;
 
+import com.programming.inventoryservice.common.InventoryPageDto;
+import com.programming.inventoryservice.dto.request.IsInStockRequestDto;
+import com.programming.inventoryservice.dto.response.IsInStockResponseDto;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import com.programming.inventoryservice.dto.InventoryDto;
 import com.programming.inventoryservice.dto.request.SaveToInventoryRequestDto;
@@ -27,23 +31,23 @@ public class InventoryController {
     }
 
     @PostMapping(value = "/save")
-    @Operation(summary = "‌خیره در فهرست محصولات")
+    @Operation(summary = "ذ‌خیره در فهرست محصولات")
     public ResponseEntity saveToInventory(@RequestBody InventoryDto requestDto){
         return ResponseEntity.ok(inventoryService.saveToInventory(requestDto));
     }
 
     @GetMapping(value = "/get-all")
     @Operation(summary = "دریافت لیست کتاب ها")
-    ResponseEntity<List<InventoryDto>> getAll(@RequestParam Integer pageSize,@RequestParam Integer pageNumber){
+    ResponseEntity<InventoryPageDto> getAll(@RequestParam Integer pageSize, @RequestParam Integer pageNumber){
         return ResponseEntity.ok(inventoryService.getAll(pageSize,pageNumber));
     }
 
 
-    @GetMapping(value = "/is-in-stock")
+    @PostMapping(value = "/is-in-stock")
     @Operation(summary = "وجود یا عدم وجود در انبار")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<InventoryDto>> isInStock(@RequestParam List<Long> bookId){
-        log.info("bookId: {}",bookId);
-        return ResponseEntity.ok(inventoryService.isInStock(bookId));
+    public ResponseEntity<IsInStockResponseDto> isInStock(@RequestBody IsInStockRequestDto requestDto, HttpServletRequest request){
+        log.info(String.valueOf(request));
+        return ResponseEntity.ok(inventoryService.isInStock(requestDto));
     }
 }

@@ -1,18 +1,28 @@
 package com.programming.inventoryservice.service.impl;
 
+import com.programming.inventoryservice.common.InventoryPageDto;
 import com.programming.inventoryservice.dto.InventoryDto;
+import com.programming.inventoryservice.dto.request.IsInStockRequestDto;
 import com.programming.inventoryservice.dto.request.SaveToInventoryRequestDto;
+import com.programming.inventoryservice.dto.response.IsInStockResponseDto;
+import com.programming.inventoryservice.exception.BookNotFoundException;
 import com.programming.inventoryservice.mapper.InventoryMapper;
 import com.programming.inventoryservice.model.Inventory;
 import com.programming.inventoryservice.repository.InventoryRepository;
 import com.programming.inventoryservice.dto.response.InventoryResponseDto;
 import com.programming.inventoryservice.service.InventoryService;
+import jakarta.ws.rs.NotFoundException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +38,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public List<InventoryDto> isInStock(List<Long> bookId) {
+    public IsInStockResponseDto isInStock(IsInStockRequestDto requestDto) {
         log.info("wait started");
         try {
             Thread.sleep(1000);
@@ -36,23 +46,35 @@ public class InventoryServiceImpl implements InventoryService {
             throw new RuntimeException(e);
         }
         log.info("wait ended");
-        List<Inventory> inventoryList = inventoryRepository.findAllById(bookId);
-        // TODO: 21.04.24 add a check for quantity
-        List<InventoryDto> inventoryResponseDtoList = inventoryMapper.toDtos(inventoryList);
-        return inventoryResponseDtoList;
+        List<Inventory> inventoryList = inventoryRepository.findAllById(requestDto.bookIds());
+        List<Boolean> isInStockList = new ArrayList<>();
+        //  add a check for quantity
+        for (Inventory inventory : inventoryList){
+            if (inventory.getQuantity() < requestDto.quantities().get(inventoryList.indexOf(inventory))){
+//                throw new BookNotFoundException("this book is not in stock");
+                isInStockList.add(false);
+            } else
+                isInStockList.add(true);
+        }
+        IsInStockResponseDto responseDto = IsInStockResponseDto.builder()
+                .bookIds(inventoryList.stream().map(Inventory::getPid).collect(Collectors.toList()))
+                .bookNames(inventoryList.stream().map(Inventory::getBookName).collect(Collectors.toList()))
+                .isInStock(isInStockList)
+                .build();
+        return responseDto;
     }
 
     @Override
-    public Void saveToInventory(InventoryDto requestDto) {
+    public ResponseEntity saveToInventory(InventoryDto requestDto) {
         Inventory inventory = inventoryMapper.toEntity(requestDto);
         inventoryRepository.save(inventory);
-        return null;
+        return ResponseEntity.status(201).body(requestDto);
     }
 
     @Override
-    public List<InventoryDto> getAll(Integer pageSize, Integer pageNumber) {
-        List<Inventory> inventoryList = inventoryRepository.findAll();
-        List<InventoryDto> inventoryDtoList = inventoryMapper.toDtos(inventoryList);
-        return inventoryDtoList;
+    public InventoryPageDto getAll(Integer pageSize, Integer pageNumber) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<Inventory> inventoryList = inventoryRepository.findAll(pageable);
+        return inventoryMapper.toPageDto(inventoryList);
     }
 }

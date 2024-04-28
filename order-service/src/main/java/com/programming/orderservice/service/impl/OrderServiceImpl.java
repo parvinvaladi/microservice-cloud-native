@@ -1,5 +1,6 @@
 package com.programming.orderservice.service.impl;
 
+import com.programming.orderservice.dto.request.InventoryRequestDto;
 import com.programming.orderservice.dto.request.OrderRequestDto;
 import com.programming.orderservice.event.OrderPlacedEvent;
 import com.programming.orderservice.repository.OrderRepository;
@@ -10,9 +11,12 @@ import com.programming.orderservice.service.OrderService;
 import jakarta.ws.rs.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Arrays;
@@ -47,17 +51,29 @@ public class OrderServiceImpl implements OrderService {
                                 .build()
                 ).collect(Collectors.toList());
         order.setOrderItems(orderItems);
-        List<Long> bookId = orderItems.stream().map(
+        List<Long> bookIds = orderItems.stream().map(
                 orderItem -> orderItem.getBookId()
         ).collect(Collectors.toList());
 
-        List<InventoryResponseDto> inventoryResponseDtos = webClient.get()
-                .uri("http://localhost:8081/api/v1/inventory/is-in-stock?bookId={bookId}",bookId.toArray())
-                .retrieve()
-                .toEntityList(InventoryResponseDto.class)
-                .block().getBody();
+        List<Integer> quantities = orderItems.stream().map(
+                orderItem -> orderItem.getQuantity()
+        ).collect(Collectors.toList());
 
-        boolean allBooksInStock = inventoryResponseDtos.stream().allMatch(InventoryResponseDto::isInStock);
+        InventoryRequestDto inventoryRequestDto = InventoryRequestDto.builder()
+                .bookIds(bookIds)
+                .quantities(quantities)
+                .build();
+
+        InventoryResponseDto inventoryResponseDto = webClient.post()
+                .uri("http://localhost:8081/api/v1/inventory/is-in-stock")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(inventoryRequestDto)
+                .retrieve()
+                .toEntity(InventoryResponseDto.class)
+                .block()
+                .getBody();
+
+        boolean allBooksInStock = !inventoryResponseDto.isInStock().contains(false);
 
             if (allBooksInStock){
                 orderRepository.save(order);
@@ -66,6 +82,5 @@ public class OrderServiceImpl implements OrderService {
             }else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not all books in stock");
             }
-
     }
 }
