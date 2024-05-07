@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,8 +67,16 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public ResponseEntity saveToInventory(InventoryDto requestDto) {
-        Inventory inventory = inventoryMapper.toEntity(requestDto);
-        inventoryRepository.save(inventory);
+        Optional<Inventory> inventoryOptional = inventoryRepository.findByBookName(requestDto.bookName());
+        if (inventoryOptional.isPresent()){
+            Inventory inventory = inventoryOptional.get();
+            inventory.setQuantity(inventory.getQuantity() + requestDto.quantity());
+            inventoryRepository.save(inventory);
+            return ResponseEntity.status(200).body(requestDto);
+        }else {
+            Inventory inventory = inventoryMapper.toEntity(requestDto);
+            inventoryRepository.save(inventory);
+        }
         return ResponseEntity.status(201).body(requestDto);
     }
 

@@ -37,8 +37,8 @@ public class BookController {
         return ResponseEntity.ok(bookService.getAll());
     }
 
-    @PostMapping("/upload")
+    @PostMapping("/upload-and-save-books")
     public ResponseEntity<String> upload(@RequestParam("file")MultipartFile file){
-        return ResponseEntity.ok(bookService.upload(file));
+        return ResponseEntity.status(HttpStatus.OK).body(bookService.upload(file));
     }
 }

@@ -1,5 +1,6 @@
 package com.programming.bookservice.service.impl;
 
+import com.programming.bookservice.common.ExcelUtility;
 import com.programming.bookservice.domain.Book;
 import com.programming.bookservice.dto.request.BookRequestDto;
 import com.programming.bookservice.dto.response.BookResponseDto;
@@ -9,13 +10,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class BookServiceImpl implements BookService {
-    public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     private final BookRepository bookRepository;
 
     public BookServiceImpl(BookRepository bookRepository) {
@@ -25,8 +29,17 @@ public class BookServiceImpl implements BookService {
     @Override
     public void saveProduct(BookRequestDto requestDto) {
         log.info(String.valueOf(requestDto));
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+        Date date;
+        try {
+            date = formatter.parse(requestDto.publishDate());
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
         Book product = Book.builder()
                 .name(requestDto.name())
+                .publisherName(requestDto.publisherName())
+                .publishDate(date)
                 .description(requestDto.description())
                 .price(requestDto.price())
                 .build();
@@ -49,15 +62,20 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public String upload(MultipartFile file) {
+        log.info("upload started");
+        String message = "";
+        if (!ExcelUtility.hasExcelFormat(file)){
+            message = "The Excel file is not upload: " + file.getOriginalFilename() + "!";
+            return message;
+        }
 
-//        try {
-//            if(!TYPE.equals(file.getContentType())){
-//                return "please upload excel file";
-//            }
-//
-//        }catch (IOException e){
-//            e.printStackTrace();
-//        }
-        return null;
+        try {
+            List<Book> bookList = ExcelUtility.excelToBookList(file.getInputStream());
+            bookRepository.saveAll(bookList);
+            message = "The Excel file is uploaded: " + file.getOriginalFilename();
+        } catch (IOException e) {
+            throw new RuntimeException("Please upload a valid Excel file!");
+        }
+        return message;
     }
 }

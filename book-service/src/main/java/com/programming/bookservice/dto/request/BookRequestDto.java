@@ -1,6 +1,6 @@
 package com.programming.bookservice.dto.request;
 
-import jakarta.persistence.Column;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -17,6 +17,8 @@ public record BookRequestDto(
          String publishDate,
          String authorName,
          String description,
-         BigDecimal price
+         BigDecimal price,
+        @NotBlank(message = "the quantity of book can not be empty")
+        Integer quantity
 ) {
 }
