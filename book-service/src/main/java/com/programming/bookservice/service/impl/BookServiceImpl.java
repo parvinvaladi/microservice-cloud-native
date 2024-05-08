@@ -71,7 +71,13 @@ public class BookServiceImpl implements BookService {
 
         try {
             List<Book> bookList = ExcelUtility.excelToBookList(file.getInputStream());
-            bookRepository.saveAll(bookList);
+            List<Book> books = bookRepository.findAll();
+            bookList.forEach(book -> {
+                if (!books.stream().anyMatch(b -> b.getName().equals(book.getName()))){
+                    bookRepository.save(book);
+                }
+
+            });
             message = "The Excel file is uploaded: " + file.getOriginalFilename();
         } catch (IOException e) {
             throw new RuntimeException("Please upload a valid Excel file!");

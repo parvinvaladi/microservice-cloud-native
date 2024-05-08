@@ -12,14 +12,16 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 @Slf4j
 public class ExcelUtility {
+    public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 //    public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    public static String TYPE = "application/vnd.oasis.opendocument.spreadsheet";
+//    public static String TYPE = "application/vnd.oasis.opendocument.spreadsheet";
     static String[] HEADERs = { "Book Name", "Publisher Name", "Publish Date", "Author Name", "Description", "Price" };
     static String SHEET = "book";
 
@@ -57,7 +59,14 @@ public class ExcelUtility {
                             book.setPublisherName(currentCell.getStringCellValue());
                             break;
                         case 2:
-                            book.setPublishDate(currentCell.getDateCellValue());
+                            try {
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+
+                                book.setPublishDate(sdf.get2DigitYearStart());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
                             break;
                         case 3:
                             book.setAuthorName(currentCell.getStringCellValue());
