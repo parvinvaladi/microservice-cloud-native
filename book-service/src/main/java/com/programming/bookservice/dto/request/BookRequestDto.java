@@ -19,6 +19,7 @@ public record BookRequestDto(
          String description,
          BigDecimal price,
         @NotBlank(message = "the quantity of book can not be empty")
-        Integer quantity
+        Integer quantity,
+        Long categoryId
 ) {
 }

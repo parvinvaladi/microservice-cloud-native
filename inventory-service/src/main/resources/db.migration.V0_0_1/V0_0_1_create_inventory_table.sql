@@ -1,4 +1,4 @@
-CREATE TABLE TBL_INVENTORY
+CREATE TABLE inventory_service_inventory
 (
     PID                    NUMBER(17)                   NOT NULL,
     BOOK_NAME              VARCHAR2(100)                NOT NULL,

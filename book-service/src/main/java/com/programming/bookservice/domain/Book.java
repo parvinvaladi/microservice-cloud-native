@@ -1,5 +1,6 @@
 package com.programming.bookservice.domain;
 
+import com.programming.lib.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,9 +15,9 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "TBL_BOOK")
+@Table(name = "book_service_book")
 @Data
-public class Book {
+public class Book extends BaseEntity {
 
 //    ,generator = "PRODUCT_SERVICE_SEQ"
     @Id
@@ -31,6 +32,7 @@ public class Book {
     private String publisherName;
 
     @Column(name = "PUBLISH_DATE")
+    @Temporal(value = TemporalType.DATE)
     private Date publishDate;
 
     @Column(name = "AUTHOR_NAME")
@@ -41,4 +43,11 @@ public class Book {
 
     @Column(name = "PRICE")
     private BigDecimal price;
+
+    @Column(name = "QUANTITY")
+    private Integer quantity;
+
+    @ManyToOne
+    @JoinColumn(name = "FK_BOOK_CATEGORY")
+    private Category category;
 }

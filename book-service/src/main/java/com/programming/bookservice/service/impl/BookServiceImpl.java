@@ -2,9 +2,12 @@ package com.programming.bookservice.service.impl;
 
 import com.programming.bookservice.common.ExcelUtility;
 import com.programming.bookservice.domain.Book;
+import com.programming.bookservice.domain.Category;
 import com.programming.bookservice.dto.request.BookRequestDto;
 import com.programming.bookservice.dto.response.BookResponseDto;
+import com.programming.bookservice.dto.response.CategoryResponseDto;
 import com.programming.bookservice.repository.BookRepository;
+import com.programming.bookservice.repository.CategoryRepository;
 import com.programming.bookservice.service.BookService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,19 +18,22 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
+    private final CategoryRepository categoryRepository;
 
-    public BookServiceImpl(BookRepository bookRepository) {
+    public BookServiceImpl(BookRepository bookRepository, CategoryRepository categoryRepository) {
         this.bookRepository = bookRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
-    public void saveProduct(BookRequestDto requestDto) {
+    public String saveProduct(BookRequestDto requestDto) {
         log.info(String.valueOf(requestDto));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
         Date date;
@@ -36,16 +42,19 @@ public class BookServiceImpl implements BookService {
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
-        Book product = Book.builder()
-                .name(requestDto.name())
-                .publisherName(requestDto.publisherName())
-                .publishDate(date)
-                .description(requestDto.description())
-                .price(requestDto.price())
-                .build();
+        Optional<Book> existingBook = bookRepository.findAll().stream().filter(book -> book.getName().equals(requestDto.name())).findFirst();
+        return existingBook.map(book -> "Book already exists").orElseGet(() -> {
+            Book product = Book.builder()
+                    .name(requestDto.name())
+                    .publisherName(requestDto.publisherName())
+                    .publishDate(date)
+                    .description(requestDto.description())
+                    .price(requestDto.price())
+                    .build();
+            bookRepository.save(product);
+            return "Book saved successfully";
+        });
 
-        log.info(String.valueOf(product));
-        bookRepository.save(product);
     }
 
     @Override
@@ -83,5 +92,15 @@ public class BookServiceImpl implements BookService {
             throw new RuntimeException("Please upload a valid Excel file!");
         }
         return message;
+    }
+
+    @Override
+    public List<CategoryResponseDto> getCategories() {
+        List<Category> categories = categoryRepository.findAll();
+        return categories.stream().map(category -> CategoryResponseDto.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .persianName(category.getPersianName())
+                .build()).collect(Collectors.toList());
     }
 }

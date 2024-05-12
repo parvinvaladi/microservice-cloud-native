@@ -40,19 +40,12 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public IsInStockResponseDto isInStock(IsInStockRequestDto requestDto) {
-        log.info("wait started");
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        log.info("wait ended");
+
         List<Inventory> inventoryList = inventoryRepository.findAllById(requestDto.bookIds());
         List<Boolean> isInStockList = new ArrayList<>();
         //  add a check for quantity
         for (Inventory inventory : inventoryList){
             if (inventory.getQuantity() < requestDto.quantities().get(inventoryList.indexOf(inventory))){
-//                throw new BookNotFoundException("this book is not in stock");
                 isInStockList.add(false);
             } else
                 isInStockList.add(true);

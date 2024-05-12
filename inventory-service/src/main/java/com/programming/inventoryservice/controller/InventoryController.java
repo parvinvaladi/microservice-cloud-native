@@ -30,10 +30,10 @@ public class InventoryController {
         this.inventoryService = inventoryService;
     }
 
-    @PostMapping(value = "/save")
-    @Operation(summary = "ذ‌خیره در فهرست محصولات")
+    @PostMapping(value = "/update-inventory")
+    @Operation(summary = "آپدیت تعداد کتاب موجودی")
     public ResponseEntity saveToInventory(@RequestBody InventoryDto requestDto){
-        return ResponseEntity.ok(inventoryService.saveToInventory(requestDto));
+        return inventoryService.saveToInventory(requestDto);
     }
 
     @GetMapping(value = "/get-all")

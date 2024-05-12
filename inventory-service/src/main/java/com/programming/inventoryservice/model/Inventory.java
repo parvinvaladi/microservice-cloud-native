@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "TBL_INVENTORY")
+@Table(name = "inventory_service_inventory")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
