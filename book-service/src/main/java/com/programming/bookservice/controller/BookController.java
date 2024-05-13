@@ -3,6 +3,7 @@ package com.programming.bookservice.controller;
 import com.programming.bookservice.dto.request.BookRequestDto;
 import com.programming.bookservice.dto.response.BookResponseDto;
 import com.programming.bookservice.dto.response.CategoryResponseDto;
+import com.programming.bookservice.dto.response.SaveBookResponseDto;
 import com.programming.bookservice.service.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
@@ -24,17 +25,25 @@ public class BookController {
         this.bookService = bookService;
     }
 
+
+    @PostMapping(value = "/save-book")
     @Operation(summary = "ذخیره کتاب جدید")
-    @PostMapping
     public ResponseEntity saveBook(@RequestBody BookRequestDto requestDto){
-        return ResponseEntity.status(HttpStatus.OK).body(bookService.saveProduct(requestDto));
+        return ResponseEntity.ok(bookService.saveProduct(requestDto));
     }
 
     @Operation(summary = "دریافت لیست کتاب ها")
-    @GetMapping
+    @GetMapping("/all")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<BookResponseDto>> getAll(){
         return ResponseEntity.ok(bookService.getAll());
+    }
+
+    @Operation(summary = "دریافت لیست کتاب ها براساس دسته بندی")
+    @GetMapping("/books-by-category")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<List<BookResponseDto>> getBooksByCategory(@RequestParam Long categoryId){
+        return ResponseEntity.ok(bookService.getBooksByCategory(categoryId));
     }
 
     @PostMapping("/upload-and-save-books")

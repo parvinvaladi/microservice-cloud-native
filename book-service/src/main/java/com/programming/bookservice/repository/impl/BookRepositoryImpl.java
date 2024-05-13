@@ -15,15 +15,22 @@ public class BookRepositoryImpl implements BookRepository {
     @Autowired
     private EntityManager entityManager;
     @Override
-    public void save(Book book) {
+    public Book save(Book book) {
 //        entityManager.persist(book);
         Session currentSession = entityManager.unwrap(Session.class);
         currentSession.saveOrUpdate(book);
+        return book;
     }
 
     @Override
     public List<Book> findAll() {
         Session currentSession = entityManager.unwrap(Session.class);
         return currentSession.createQuery("from Book", Book.class).getResultList();
+    }
+
+    @Override
+    public List<Book> findAllByCategoryId(Long categoryId) {
+        Session currentSession = entityManager.unwrap(Session.class);
+        return currentSession.createQuery("from Book where category.id = :categoryId", Book.class).setParameter("categoryId", categoryId).getResultList();
     }
 }

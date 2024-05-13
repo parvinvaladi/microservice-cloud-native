@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 public interface BookRepository {
-    void save(Book book);
+    Book save(Book book);
     List<Book> findAll();
+
+    List<Book> findAllByCategoryId(Long categoryId);
 }

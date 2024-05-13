@@ -6,9 +6,11 @@ import com.programming.bookservice.domain.Category;
 import com.programming.bookservice.dto.request.BookRequestDto;
 import com.programming.bookservice.dto.response.BookResponseDto;
 import com.programming.bookservice.dto.response.CategoryResponseDto;
+import com.programming.bookservice.dto.response.SaveBookResponseDto;
 import com.programming.bookservice.repository.BookRepository;
 import com.programming.bookservice.repository.CategoryRepository;
 import com.programming.bookservice.service.BookService;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,7 +35,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public String saveProduct(BookRequestDto requestDto) {
+    public Long saveProduct(BookRequestDto requestDto) {
         log.info(String.valueOf(requestDto));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
         Date date;
@@ -42,24 +44,36 @@ public class BookServiceImpl implements BookService {
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
-        Optional<Book> existingBook = bookRepository.findAll().stream().filter(book -> book.getName().equals(requestDto.name())).findFirst();
-        return existingBook.map(book -> "Book already exists").orElseGet(() -> {
-            Book product = Book.builder()
-                    .name(requestDto.name())
-                    .publisherName(requestDto.publisherName())
-                    .publishDate(date)
-                    .description(requestDto.description())
-                    .price(requestDto.price())
-                    .build();
-            bookRepository.save(product);
-            return "Book saved successfully";
-        });
-
+        Category category = categoryRepository.findById(requestDto.categoryId());
+        Book product = Book.builder()
+                .name(requestDto.name())
+                .publisherName(requestDto.publisherName())
+                .publishDate(date)
+                .description(requestDto.description())
+                .price(requestDto.price())
+                .category(category)
+                .build();
+        Book saved = bookRepository.save(product);
+//        SaveBookResponseDto responseDto = new SaveBookResponseDto(saved.getId(), saved.getName());
+//        return responseDto;
+        return saved.getId();
     }
 
     @Override
     public List<BookResponseDto> getAll() {
         List<Book> products = bookRepository.findAll();
+        List<BookResponseDto> responseDtos = products.stream().map(product -> BookResponseDto.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .description(product.getDescription())
+                .price(product.getPrice())
+                .build()).collect(Collectors.toList());
+        return responseDtos;
+    }
+
+    @Override
+    public List<BookResponseDto> getBooksByCategory(Long categoryId) {
+        List<Book> products = bookRepository.findAllByCategoryId(categoryId);
         List<BookResponseDto> responseDtos = products.stream().map(product -> BookResponseDto.builder()
                 .id(product.getId())
                 .name(product.getName())
@@ -79,14 +93,10 @@ public class BookServiceImpl implements BookService {
         }
 
         try {
+            ExcelUtility.setCategoryRepository(categoryRepository);
             List<Book> bookList = ExcelUtility.excelToBookList(file.getInputStream());
             List<Book> books = bookRepository.findAll();
-            bookList.forEach(book -> {
-                if (!books.stream().anyMatch(b -> b.getName().equals(book.getName()))){
-                    bookRepository.save(book);
-                }
-
-            });
+            bookList.forEach(bookRepository::save);
             message = "The Excel file is uploaded: " + file.getOriginalFilename();
         } catch (IOException e) {
             throw new RuntimeException("Please upload a valid Excel file!");

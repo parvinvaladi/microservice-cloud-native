@@ -2,19 +2,17 @@ package com.programming.bookservice.domain;
 
 import com.programming.lib.domain.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
 @Table(name = "book_service_category")
-@Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Setter
+@Getter
 public class Category extends BaseEntity {
     @Id
     @Column(name = "PID", nullable = false)
@@ -32,4 +30,15 @@ public class Category extends BaseEntity {
 
     @OneToMany(cascade = CascadeType.ALL,targetEntity = Book.class,mappedBy = "category")
     private List<Book> books;
+
+//    @Override
+//    public String toString() {
+//        return "Category{" +
+//                "id=" + id +
+//                ", name='" + name + '\'' +
+//                ", persianName='" + persianName + '\'' +
+//                ", description='" + description + '\'' +
+//                ", books=" + books +
+//                '}';
+//    }
 }

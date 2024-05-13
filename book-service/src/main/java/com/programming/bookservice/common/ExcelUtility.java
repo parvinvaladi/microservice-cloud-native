@@ -1,6 +1,8 @@
 package com.programming.bookservice.common;
 
 import com.programming.bookservice.domain.Book;
+import com.programming.bookservice.domain.Category;
+import com.programming.bookservice.repository.CategoryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -19,11 +21,17 @@ import java.util.List;
 
 @Slf4j
 public class ExcelUtility {
+
+    private static CategoryRepository categoryRepository;
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 //    public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 //    public static String TYPE = "application/vnd.oasis.opendocument.spreadsheet";
     static String[] HEADERs = { "Book Name", "Publisher Name", "Publish Date", "Author Name", "Description", "Price" };
     static String SHEET = "book";
+
+    public static void setCategoryRepository(CategoryRepository repository) {
+        categoryRepository = repository;
+    }
 
     public static boolean hasExcelFormat(MultipartFile file) {
         log.info(file.getContentType());
@@ -61,7 +69,6 @@ public class ExcelUtility {
                         case 2:
                             try {
                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
-
                                 book.setPublishDate(sdf.get2DigitYearStart());
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -77,6 +84,9 @@ public class ExcelUtility {
                         case 5:
                             book.setPrice(BigDecimal.valueOf(currentCell.getNumericCellValue()));
                             break;
+                        case 6:
+                            Category byId = categoryRepository.findById((long) currentCell.getNumericCellValue());
+                            book.setCategory(byId);
                         default:
                             break;
                     }

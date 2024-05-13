@@ -44,9 +44,6 @@ public class Book extends BaseEntity {
     @Column(name = "PRICE")
     private BigDecimal price;
 
-    @Column(name = "QUANTITY")
-    private Integer quantity;
-
     @ManyToOne
     @JoinColumn(name = "FK_BOOK_CATEGORY")
     private Category category;
