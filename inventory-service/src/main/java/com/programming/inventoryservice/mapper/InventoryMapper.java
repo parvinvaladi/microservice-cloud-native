@@ -5,6 +5,9 @@ import com.programming.inventoryservice.dto.InventoryDto;
 import com.programming.inventoryservice.model.Inventory;
 import lombok.Builder;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
+import org.mapstruct.Named;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -15,7 +18,13 @@ public interface InventoryMapper {
     Inventory toEntity(InventoryDto inventoryDto);
     List<InventoryDto> toDtos(List<Inventory> inventory);
     List<Inventory> toEntities(List<InventoryDto> inventoryDtos);
-    InventoryPageDto toPageDto(Page<Inventory> inventoryPage);
+    @Mappings({
+            @Mapping(target = "inventoryDtoList",qualifiedByName = "inventoryPageToDtoList")
+    })
+    List<InventoryDto> inventoryPageToDtoList(Page<Inventory> inventories);
 
-
+    @Named("inventoryPageToDtoList")
+    default List<InventoryDto> inventoryPageToDtos(Page<Inventory> inventories){
+        return toDtos(inventories.getContent());
+    }
 }

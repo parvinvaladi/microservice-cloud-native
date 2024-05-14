@@ -1,8 +1,14 @@
 package com.programming.inventoryservice.dto;
 
-public record InventoryDto(
-//        Long pid,
-        String bookName,
-        Integer quantity
-) {
+import jakarta.persistence.Column;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
+public class InventoryDto {
+
+    private Long bookId;
+    private Integer quantity;
 }

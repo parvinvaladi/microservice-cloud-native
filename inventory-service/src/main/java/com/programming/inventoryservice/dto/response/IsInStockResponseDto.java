@@ -7,7 +7,6 @@ import java.util.List;
 @Builder
 public record IsInStockResponseDto(
         List<Long> bookIds,
-        List<String> bookNames,
         List<Boolean> isInStock
 ) {
 }

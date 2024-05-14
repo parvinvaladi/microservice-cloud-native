@@ -9,5 +9,5 @@ import java.util.List;
 public class InventoryPageDto {
     private int totalPage;
     private long totalRecords;
-    private List<InventoryDto> content;
+    private List<InventoryDto> inventoryDtoList;
 }

@@ -13,5 +13,5 @@ import java.util.List;
 public interface InventoryService {
     IsInStockResponseDto isInStock(IsInStockRequestDto requestDto);
     ResponseEntity saveToInventory(InventoryDto requestDto);
-    InventoryPageDto getAll(Integer pageSize, Integer pageNumber);
+    List<InventoryDto> getAll(Integer pageSize, Integer pageNumber);
 }

@@ -41,29 +41,40 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     public IsInStockResponseDto isInStock(IsInStockRequestDto requestDto) {
 
-        List<Inventory> inventoryList = inventoryRepository.findAllById(requestDto.bookIds());
+        List<Inventory> inventoryList = new ArrayList<>();
         List<Boolean> isInStockList = new ArrayList<>();
-        //  add a check for quantity
-        for (Inventory inventory : inventoryList){
-            if (inventory.getQuantity() < requestDto.quantities().get(inventoryList.indexOf(inventory))){
-                isInStockList.add(false);
-            } else
-                isInStockList.add(true);
+
+        for (Long bookId : requestDto.bookIds()) {
+            Optional<Inventory> byBookId = inventoryRepository.findByBookId(bookId);
+            if (byBookId.isPresent()) {
+                Inventory inventory = byBookId.get();
+                inventoryList.add(inventory);
+
+                int quantityIndex = requestDto.bookIds().indexOf(bookId);
+                int requestedQuantity = requestDto.quantities().get(quantityIndex);
+
+                if (inventory.getQuantity() >= requestedQuantity) {
+                    isInStockList.add(true);
+                } else {
+                    isInStockList.add(false);
+                }
+            }
         }
+
         IsInStockResponseDto responseDto = IsInStockResponseDto.builder()
-                .bookIds(inventoryList.stream().map(Inventory::getPid).collect(Collectors.toList()))
-                .bookNames(inventoryList.stream().map(Inventory::getBookName).collect(Collectors.toList()))
+                .bookIds(inventoryList.stream().map(Inventory::getBookId).collect(Collectors.toList()))
                 .isInStock(isInStockList)
                 .build();
+
         return responseDto;
     }
 
     @Override
     public ResponseEntity saveToInventory(InventoryDto requestDto) {
-        Optional<Inventory> inventoryOptional = inventoryRepository.findByBookName(requestDto.bookName());
+        Optional<Inventory> inventoryOptional = inventoryRepository.findByBookId(requestDto.getBookId());
         if (inventoryOptional.isPresent()){
             Inventory inventory = inventoryOptional.get();
-            inventory.setQuantity(inventory.getQuantity() + requestDto.quantity());
+            inventory.setQuantity(inventory.getQuantity() + requestDto.getQuantity());
             inventoryRepository.save(inventory);
             return ResponseEntity.status(200).body(requestDto);
         }else {
@@ -74,9 +85,9 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public InventoryPageDto getAll(Integer pageSize, Integer pageNumber) {
+    public List<InventoryDto> getAll(Integer pageSize, Integer pageNumber) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<Inventory> inventoryList = inventoryRepository.findAll(pageable);
-        return inventoryMapper.toPageDto(inventoryList);
+        return inventoryMapper.inventoryPageToDtoList(inventoryList);
     }
 }

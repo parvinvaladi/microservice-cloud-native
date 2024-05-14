@@ -16,8 +16,8 @@ public class Inventory {
     @Column(name = "PID")
     private Long pid;
 
-    @Column(name = "BOOK_NAME")
-    private String bookName;
+    @Column(name = "BOOK_ID")
+    private Long bookId;
 
     @Column(name = "QUANTITY")
     private Integer quantity;

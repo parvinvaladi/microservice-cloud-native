@@ -38,7 +38,7 @@ public class InventoryController {
 
     @GetMapping(value = "/get-all")
     @Operation(summary = "دریافت لیست کتاب ها")
-    ResponseEntity<InventoryPageDto> getAll(@RequestParam Integer pageSize, @RequestParam Integer pageNumber){
+    ResponseEntity<List<InventoryDto>> getAll(@RequestParam Integer pageSize, @RequestParam Integer pageNumber){
         return ResponseEntity.ok(inventoryService.getAll(pageSize,pageNumber));
     }
 
