@@ -1,5 +1,6 @@
 package com.programming.orderservice.controller;
 
+import com.programming.orderservice.dto.request.OrderItemRequestDto;
 import com.programming.orderservice.dto.request.OrderRequestDto;
 import com.programming.orderservice.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,7 +24,7 @@ public class OrderController {
 //    @CircuitBreaker(name = "inventory",fallbackMethod = "fallbackMethod")
 //    @TimeLimiter(name = "inventory")
 //    @Retry(name = "inventory")
-    public ResponseEntity<String> saveOrder(@RequestBody OrderRequestDto requestDto){
+    public ResponseEntity<String> saveOrder(@RequestBody OrderItemRequestDto requestDto){
         return orderService.saveOrder(requestDto);
     }
 

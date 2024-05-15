@@ -41,6 +41,13 @@ eureka:
 
 
 
+grpc:
+  client:
+    myService:
+      address : "static://127.0.0.1:9090"
+      negotiation-type: plaintext
+
+
 
 #management.health.circuitbreakers.enabled=true
 #management.endpoints.web.exposure.include=*

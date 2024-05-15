@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Getter
 public class InventoryDto {
-
+    private Long pid;
     private Long bookId;
     private Integer quantity;
 }

@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 option java_multiple_files = true;
-option java_package = "com.programming.inventoryservice";
+option java_package = "com.programming.orderservice";
 
 message IsInStockRequestDto{
   repeated int64 book_ids = 1;
@@ -10,6 +10,7 @@ message IsInStockRequestDto{
 
 message IsInStockResponseDto{
   repeated int64 book_ids = 1;
+  repeated string book_names = 2;
   repeated bool is_in_stock = 3;
 }
 

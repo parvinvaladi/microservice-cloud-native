@@ -1,8 +1,10 @@
 package com.programming.orderservice.service.impl;
 
 import com.programming.orderservice.dto.request.InventoryRequestDto;
+import com.programming.orderservice.dto.request.OrderItemRequestDto;
 import com.programming.orderservice.dto.request.OrderRequestDto;
 import com.programming.orderservice.event.OrderPlacedEvent;
+import com.programming.orderservice.repository.OrderItemRepository;
 import com.programming.orderservice.repository.OrderRepository;
 import com.programming.orderservice.dto.response.InventoryResponseDto;
 import com.programming.orderservice.domain.Order;
@@ -28,40 +30,30 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
 
     @Autowired
     private WebClient webClient;
 
     private final KafkaTemplate kafkaTemplate;
 
-    public OrderServiceImpl(OrderRepository orderRepository, KafkaTemplate kafkaTemplate) {
+    public OrderServiceImpl(OrderRepository orderRepository, OrderItemRepository orderItemRepository, KafkaTemplate kafkaTemplate) {
         this.orderRepository = orderRepository;
+        this.orderItemRepository = orderItemRepository;
         this.kafkaTemplate = kafkaTemplate;
     }
 
     @Override
-    public ResponseEntity<String> saveOrder(OrderRequestDto orderRequestDto) {
-        Order order = new Order();
-        order.setOrderNumber(UUID.randomUUID().toString());
-        List<OrderItem> orderItems= orderRequestDto.orderItemRequestDtos().stream().map(orderItemRequestDto ->
-                        OrderItem.builder()
-                                .bookId(orderItemRequestDto.bookId())
-                                .price(orderItemRequestDto.price())
-                                .quantity(orderItemRequestDto.quantity())
-                                .build()
-                ).collect(Collectors.toList());
-        order.setOrderItems(orderItems);
-        List<Long> bookIds = orderItems.stream().map(
-                orderItem -> orderItem.getBookId()
-        ).collect(Collectors.toList());
+    public ResponseEntity<String> saveOrder(OrderItemRequestDto orderRequestDto) {
 
-        List<Integer> quantities = orderItems.stream().map(
-                orderItem -> orderItem.getQuantity()
-        ).collect(Collectors.toList());
+        OrderItem orderItem = OrderItem.builder()
+                .bookId(orderRequestDto.bookId())
+                .quantity(orderRequestDto.quantity())
+                .build();
 
         InventoryRequestDto inventoryRequestDto = InventoryRequestDto.builder()
-                .bookIds(bookIds)
-                .quantities(quantities)
+                .bookIds(List.of(orderItem.getBookId()))
+                .quantities(List.of(orderItem.getQuantity()))
                 .build();
 
         InventoryResponseDto inventoryResponseDto = webClient.post()
@@ -76,7 +68,7 @@ public class OrderServiceImpl implements OrderService {
         boolean allBooksInStock = !inventoryResponseDto.isInStock().contains(false);
 
             if (allBooksInStock){
-                orderRepository.save(order);
+                orderItemRepository.save(orderItem);
 //                kafkaTemplate.send("notificationTopic", new OrderPlacedEvent(order.getOrderNumber()));
                 return ResponseEntity.ok("");
             }else {
