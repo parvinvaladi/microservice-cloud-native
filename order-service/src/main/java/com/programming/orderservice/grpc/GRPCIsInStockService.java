@@ -44,7 +44,7 @@ public class GRPCIsInStockService extends GRPCIsInStockServiceGrpc.GRPCIsInStock
 
     ///////////////////////////////////////////////////////////////////
 
-    @GrpcClient("{grpc.client.myService}")
+    @GrpcClient("myService")
     private GRPCIsInStockServiceGrpc.GRPCIsInStockServiceBlockingStub myServiceStub;
 
     public IsInStockResponseDto isInStock(List<Long> bookIds, List<Integer> quantities) {
