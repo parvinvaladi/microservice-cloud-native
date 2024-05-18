@@ -1,8 +1,8 @@
 package com.programming.inventoryservice.grpc;
 
 import com.programming.inventoryservice.GRPCIsInStockServiceGrpc;
+import com.programming.inventoryservice.IsInStockGRPCResponse;
 import com.programming.inventoryservice.IsInStockRequestDto;
-import com.programming.inventoryservice.IsInStockResponseDto;
 import com.programming.inventoryservice.model.Inventory;
 import com.programming.inventoryservice.repository.InventoryRepository;
 import io.grpc.stub.StreamObserver;
@@ -22,7 +22,7 @@ public class GRPCIsInStockService extends GRPCIsInStockServiceGrpc.GRPCIsInStock
     }
 
     @Override
-    public void isInStock(IsInStockRequestDto request, StreamObserver<IsInStockResponseDto> responseObserver) {
+    public void isInStock(IsInStockRequestDto request, StreamObserver<IsInStockGRPCResponse> responseObserver) {
         List<Inventory> inventoryList = new ArrayList<>();
         List<Boolean> isInStockList = new ArrayList<>();
 
@@ -42,7 +42,7 @@ public class GRPCIsInStockService extends GRPCIsInStockServiceGrpc.GRPCIsInStock
                 }
             }
         }
-        IsInStockResponseDto responseDto = IsInStockResponseDto.newBuilder()
+        IsInStockGRPCResponse responseDto = IsInStockGRPCResponse.newBuilder()
                 .addAllBookIds(inventoryList.stream().map(Inventory::getBookId).collect(Collectors.toList()))
                 .addAllIsInStock(isInStockList)
                 .build();

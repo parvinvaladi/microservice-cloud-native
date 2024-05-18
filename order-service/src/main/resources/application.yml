@@ -44,7 +44,7 @@ eureka:
 grpc:
   client:
     myService:
-      address : "static://127.0.0.1:9090"
+      address : "static://127.0.0.1:8081"
       negotiation-type: plaintext
 
 

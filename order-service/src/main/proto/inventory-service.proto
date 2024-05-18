@@ -8,12 +8,11 @@ message IsInStockRequestDto{
   repeated int32 quantities = 2;
 }
 
-message IsInStockResponseDto{
+message IsInStockGRPCResponse{
   repeated int64 book_ids = 1;
-  repeated string book_names = 2;
-  repeated bool is_in_stock = 3;
+  repeated bool is_in_stock = 2;
 }
 
 service GRPCIsInStockService{
-  rpc IsInStock(IsInStockRequestDto) returns (IsInStockResponseDto) {};
+  rpc IsInStock(IsInStockRequestDto) returns (IsInStockGRPCResponse) {};
 }

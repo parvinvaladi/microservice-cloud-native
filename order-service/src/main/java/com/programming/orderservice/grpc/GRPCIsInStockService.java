@@ -1,9 +1,13 @@
 package com.programming.orderservice.grpc;
 
 import com.programming.orderservice.GRPCIsInStockServiceGrpc;
+import com.programming.orderservice.IsInStockGRPCResponse;
 import com.programming.orderservice.IsInStockRequestDto;
-import com.programming.orderservice.IsInStockResponseDto;
+
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,12 +51,18 @@ public class GRPCIsInStockService extends GRPCIsInStockServiceGrpc.GRPCIsInStock
     @GrpcClient("myService")
     private GRPCIsInStockServiceGrpc.GRPCIsInStockServiceBlockingStub myServiceStub;
 
-    public IsInStockResponseDto isInStock(List<Long> bookIds, List<Integer> quantities) {
+    public IsInStockGRPCResponse isInStock(List<Long> bookIds, List<Integer> quantities) {
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 9090)
+                .usePlaintext()
+                .build();
+
+        GRPCIsInStockServiceGrpc.GRPCIsInStockServiceBlockingStub stub = GRPCIsInStockServiceGrpc.newBlockingStub(channel);
          IsInStockRequestDto request = IsInStockRequestDto.newBuilder()
                 .addAllBookIds(bookIds)
                 .addAllQuantities(quantities)
                 .build();
-         return myServiceStub.isInStock(request);
+        IsInStockGRPCResponse inStock = stub.isInStock(request);
+        return inStock;
     }
 
 
