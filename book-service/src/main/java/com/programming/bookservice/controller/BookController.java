@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/book")
+@RequestMapping(value = "/api/v1/book")
 @Slf4j
 public class BookController {
 
@@ -37,6 +37,12 @@ public class BookController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<BookResponseDto>> getAll(){
         return ResponseEntity.ok(bookService.getAll());
+    }
+
+    @Operation(summary = "دریافت کتاب با استفاده از id")
+    @GetMapping("/book-by-id")
+    public ResponseEntity<BookResponseDto> getBookById(@RequestParam Long id){
+        return ResponseEntity.ok(bookService.getBookById(id));
     }
 
     @Operation(summary = "دریافت لیست کتاب ها براساس دسته بندی")

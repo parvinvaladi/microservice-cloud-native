@@ -3,6 +3,8 @@ package com.programming.inventoryservice.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Date;
+
 @Entity
 @Table(name = "inventory_service_inventory")
 @Data
@@ -21,4 +23,11 @@ public class Inventory {
 
     @Column(name = "QUANTITY")
     private Integer quantity;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "LAST_RESTOCKED_DATE")
+    private Date lastRestockedDate;
+
+    @Column(name = "LOCATION")
+    private String location;
 }

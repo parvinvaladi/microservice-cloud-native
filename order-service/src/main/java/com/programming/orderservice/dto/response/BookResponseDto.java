@@ -1,4 +1,4 @@
-package com.programming.bookservice.dto.response;
+package com.programming.orderservice.dto.response;
 
 import lombok.Builder;
 

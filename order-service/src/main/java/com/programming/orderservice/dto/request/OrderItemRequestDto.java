@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 public record OrderItemRequestDto(
         Long id,
         Long bookId,
-        BigDecimal price,
         Integer quantity
 ) {
 }

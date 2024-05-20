@@ -6,12 +6,11 @@ import com.programming.bookservice.domain.Category;
 import com.programming.bookservice.dto.request.BookRequestDto;
 import com.programming.bookservice.dto.response.BookResponseDto;
 import com.programming.bookservice.dto.response.CategoryResponseDto;
-import com.programming.bookservice.dto.response.SaveBookResponseDto;
 import com.programming.bookservice.repository.BookRepository;
 import com.programming.bookservice.repository.CategoryRepository;
 import com.programming.bookservice.service.BookService;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,7 +19,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -72,6 +70,20 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    public BookResponseDto getBookById(Long id) {
+        Book book = bookRepository.getById(id);
+        BookResponseDto responseDto = BookResponseDto.builder()
+                .id(book.getId())
+                .name(book.getName())
+                .description(book.getDescription())
+                .price(book.getPrice())
+                .categoryId(book.getCategory().getId())
+                .categoryName(bookRepository.findCategoryName(id))
+                .build();
+        return responseDto;
+    }
+
+    @Override
     public List<BookResponseDto> getBooksByCategory(Long categoryId) {
         List<Book> products = bookRepository.findAllByCategoryId(categoryId);
         List<BookResponseDto> responseDtos = products.stream().map(product -> BookResponseDto.builder()
@@ -105,6 +117,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Cacheable(value = "cache")
     public List<CategoryResponseDto> getCategories() {
         List<Category> categories = categoryRepository.findAll();
         return categories.stream().map(category -> CategoryResponseDto.builder()

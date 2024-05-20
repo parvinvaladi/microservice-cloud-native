@@ -2,6 +2,7 @@ package com.programming.orderservice.controller;
 
 
 import com.programming.orderservice.IsInStockGRPCResponse;
+import com.programming.orderservice.dto.ResponseMessageDto;
 import com.programming.orderservice.dto.request.OrderItemRequestDto;
 import com.programming.orderservice.dto.request.OrderRequestDto;
 import com.programming.orderservice.dto.response.InventoryResponseDto;
@@ -29,13 +30,8 @@ public class RestVSGrpcController {
     }
 
     @GetMapping("/grpc/save-order/v1")
-    public ResponseEntity<InventoryResponseDto> saveOrderGrpc(@RequestParam List<Long> bookIds, @RequestParam List<Integer> quantities){
+    public ResponseEntity<ResponseMessageDto> saveOrderGrpc(@RequestParam List<Long> bookIds, @RequestParam List<Integer> quantities){
 
-        IsInStockGRPCResponse grpcIsInStockServiceInStock = grpcIsInStockService.isInStock(bookIds, quantities);
-        InventoryResponseDto inventoryResponseDto = InventoryResponseDto.builder()
-                .bookIds(grpcIsInStockServiceInStock.getBookIdsList())
-                .isInStock(grpcIsInStockServiceInStock.getIsInStockList())
-                .build();
-        return ResponseEntity.ok(inventoryResponseDto);
+        return grpcIsInStockService.isInStock(bookIds, quantities);
     }
 }

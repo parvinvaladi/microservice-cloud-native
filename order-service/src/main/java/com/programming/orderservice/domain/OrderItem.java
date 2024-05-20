@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Entity
 @Table(name = "ORDER_SERVICE_ORDER_ITEMS")
@@ -24,11 +25,14 @@ public class OrderItem {
     @Column(name = "BOOK_ID")
     private Long bookId;
 
-    @Column(name = "PRICE")
-    private BigDecimal price;
-
     @Column(name = "QUANTITY")
     private Integer quantity;
+
+//    pending, shipped, delivered, canceled)
+    private String status;
+
+    @Column(name = "CUSTOMER_ID")
+    private Long customerId;
 
     @ManyToOne
     @JoinColumn(name = "FK_ORDER")

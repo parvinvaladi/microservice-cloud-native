@@ -29,6 +29,19 @@ public class BookRepositoryImpl implements BookRepository {
     }
 
     @Override
+    public Book getById(Long id) {
+        Session currentSession = entityManager.unwrap(Session.class);
+        return currentSession.createQuery("from Book where id = :id", Book.class).setParameter("id", id).getSingleResult();
+    }
+
+    @Override
+    public String findCategoryName(Long bookId) {
+        Session currentSession = entityManager.unwrap(Session.class);
+//        return currentSession.createQuery("from Book b inner join b.category c where b.id = :bookId", String.class).setParameter("bookId", bookId).getSingleResult();
+        return currentSession.createQuery("SELECT c.name from Book b inner join b.category c where b.id = :bookId ", String.class).setParameter("bookId", bookId).getSingleResult();
+    }
+
+    @Override
     public List<Book> findAllByCategoryId(Long categoryId) {
         Session currentSession = entityManager.unwrap(Session.class);
         return currentSession.createQuery("from Book where category.id = :categoryId", Book.class).setParameter("categoryId", categoryId).getResultList();

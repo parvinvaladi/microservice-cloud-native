@@ -17,4 +17,6 @@ public interface BookService {
     List<BookResponseDto> getBooksByCategory(Long categoryId);
     String upload(MultipartFile file);
     List<CategoryResponseDto> getCategories();
+
+    BookResponseDto getBookById(Long id);
 }

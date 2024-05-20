@@ -9,6 +9,8 @@ import java.util.List;
 public interface BookRepository {
     Book save(Book book);
     List<Book> findAll();
+    Book getById(Long id);
 
     List<Book> findAllByCategoryId(Long categoryId);
+    String findCategoryName(Long bookId);
 }
