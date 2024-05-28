@@ -1,6 +1,5 @@
 package com.programming.bookservice.domain;
 
-import com.programming.lib.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +16,7 @@ import java.util.Date;
 @Entity
 @Table(name = "book_service_book")
 @Data
-public class Book extends BaseEntity {
+public class Book {
 
 //    ,generator = "PRODUCT_SERVICE_SEQ"
     @Id

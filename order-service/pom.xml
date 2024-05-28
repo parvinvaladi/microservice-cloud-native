@@ -116,10 +116,15 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
             <version>4.1.1</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.programming</groupId>
+            <artifactId>lib</artifactId>
+            <version>0.0.1</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
+
         <dependencies>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
