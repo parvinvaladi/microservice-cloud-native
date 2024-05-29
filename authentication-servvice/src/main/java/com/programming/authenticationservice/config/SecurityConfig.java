@@ -30,7 +30,7 @@ public class SecurityConfig {
         http.csrf().disable()
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/authentication/register", "/authentication/login", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                                .requestMatchers("/authentication/evaluate","/authentication/kapcha","/authentication/register", "/authentication/login", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                                 .requestMatchers("/authentication/save-role/**").hasRole("SUPER_ADMIN")
                                 .anyRequest().authenticated()
                 )
@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .logout(logout ->
                         logout.permitAll()
                 )
-//                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+//                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
         ;
         return http.build();
     }
@@ -57,8 +57,8 @@ public class SecurityConfig {
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
     }
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter();
-    }
+//    @Bean
+//    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+//        return new JwtAuthenticationFilter();
+//    }
 }
