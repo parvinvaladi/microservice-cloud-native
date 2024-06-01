@@ -6,10 +6,7 @@ import com.programming.authenticationservice.service.impl.MyUserDetailsService;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/authentication")
@@ -26,8 +23,8 @@ public class UserController {
         return myUserDetailsService.register(requestDto);
     }
 
-    @PostMapping("/login")
-    public UserDetails login(@RequestBody String userName){
+    @GetMapping("/get-user-details")
+    public UserDetails getUserDetails(@RequestParam String userName){
         return myUserDetailsService.loadUserByUsername(userName);
     }
 
