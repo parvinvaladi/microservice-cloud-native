@@ -1,6 +1,6 @@
 package com.programming.bookservice.domain;
 
-import com.programming.lib.domain.BaseEntity;
+import com.programming.bookservice.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,14 +31,4 @@ public class Category extends BaseEntity {
     @OneToMany(cascade = CascadeType.ALL,targetEntity = Book.class,mappedBy = "category")
     private List<Book> books;
 
-//    @Override
-//    public String toString() {
-//        return "Category{" +
-//                "id=" + id +
-//                ", name='" + name + '\'' +
-//                ", persianName='" + persianName + '\'' +
-//                ", description='" + description + '\'' +
-//                ", books=" + books +
-//                '}';
-//    }
 }

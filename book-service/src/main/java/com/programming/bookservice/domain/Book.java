@@ -1,5 +1,6 @@
 package com.programming.bookservice.domain;
 
+import com.programming.bookservice.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +17,7 @@ import java.util.Date;
 @Entity
 @Table(name = "book_service_book")
 @Data
-public class Book {
+public class Book extends BaseEntity {
 
 //    ,generator = "PRODUCT_SERVICE_SEQ"
     @Id
@@ -24,7 +25,7 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "NAME",unique = true, nullable = false)
+    @Column(name = "NAME", nullable = false)
     private String name;
 
     @Column(name = "PUBLISHER_NAME")
@@ -46,4 +47,7 @@ public class Book {
     @ManyToOne
     @JoinColumn(name = "FK_BOOK_CATEGORY")
     private Category category;
+
+    @Column(name = "BOOK_IMAGE")
+    private byte[] image;
 }

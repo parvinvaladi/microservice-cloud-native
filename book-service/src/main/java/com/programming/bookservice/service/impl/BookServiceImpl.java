@@ -3,6 +3,7 @@ package com.programming.bookservice.service.impl;
 import com.programming.bookservice.common.ExcelUtility;
 import com.programming.bookservice.domain.Book;
 import com.programming.bookservice.domain.Category;
+import com.programming.bookservice.dto.ResponseMessageDto;
 import com.programming.bookservice.dto.request.BookRequestDto;
 import com.programming.bookservice.dto.response.BookResponseDto;
 import com.programming.bookservice.dto.response.CategoryResponseDto;
@@ -11,14 +12,19 @@ import com.programming.bookservice.repository.CategoryRepository;
 import com.programming.bookservice.service.BookService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.ObjectInputFilter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -70,8 +76,13 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookResponseDto getBookById(Long id) {
-        Book book = bookRepository.getById(id);
+    public ResponseEntity<ResponseMessageDto> getBookById(Long id) {
+        Optional<Book> bookOptional = bookRepository.getById(id);
+        if (bookOptional.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseMessageDto.builder().status(HttpStatus.NOT_FOUND)
+                    .message("not found")
+                    .build());
+        Book book = bookOptional.get();
         BookResponseDto responseDto = BookResponseDto.builder()
                 .id(book.getId())
                 .name(book.getName())
@@ -80,7 +91,9 @@ public class BookServiceImpl implements BookService {
                 .categoryId(book.getCategory().getId())
                 .categoryName(bookRepository.findCategoryName(id))
                 .build();
-        return responseDto;
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseMessageDto.builder()
+                        .data(responseDto)
+                .build());
     }
 
     @Override
@@ -125,5 +138,23 @@ public class BookServiceImpl implements BookService {
                 .name(category.getName())
                 .persianName(category.getPersianName())
                 .build()).collect(Collectors.toList());
+    }
+
+    @Override
+    public ResponseEntity<ResponseMessageDto> uploadImage(MultipartFile file, Long bookId) {
+        Optional<Book> bookOptional;
+        try {
+            byte [] content = file.getBytes();
+            bookOptional = bookRepository.getById(bookId);
+            if (bookOptional.isEmpty())
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseMessageDto.builder().status(HttpStatus.NOT_FOUND)
+                                .message("not found")
+                        .build());
+            log.info(Arrays.toString(content));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Book book = bookOptional.get();
+        return null;
     }
 }

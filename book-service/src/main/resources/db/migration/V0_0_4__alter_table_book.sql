@@ -1,0 +1,1 @@
+ALTER TABLE book_service_book ADD BOOK_IMAGE BLOB NULL;

@@ -3,11 +3,13 @@ package com.programming.bookservice.repository.impl;
 import com.programming.bookservice.domain.Book;
 import com.programming.bookservice.repository.BookRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class BookRepositoryImpl implements BookRepository {
@@ -29,9 +31,15 @@ public class BookRepositoryImpl implements BookRepository {
     }
 
     @Override
-    public Book getById(Long id) {
+    public Optional<Book> getById(Long id) {
         Session currentSession = entityManager.unwrap(Session.class);
-        return currentSession.createQuery("from Book where id = :id", Book.class).setParameter("id", id).getSingleResult();
+        try {
+            Book book = currentSession.createQuery("from Book where id = :id", Book.class).setParameter("id", id).getSingleResult();
+            return Optional.of(book);
+        }catch (NoResultException e){
+            return Optional.empty();
+        }
+
     }
 
     @Override
@@ -45,5 +53,10 @@ public class BookRepositoryImpl implements BookRepository {
     public List<Book> findAllByCategoryId(Long categoryId) {
         Session currentSession = entityManager.unwrap(Session.class);
         return currentSession.createQuery("from Book where category.id = :categoryId", Book.class).setParameter("categoryId", categoryId).getResultList();
+    }
+
+    @Override
+    public Book uploadImage(byte[] image) {
+        return null;
     }
 }

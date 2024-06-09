@@ -1,5 +1,6 @@
 package com.programming.bookservice.controller;
 
+import com.programming.bookservice.dto.ResponseMessageDto;
 import com.programming.bookservice.dto.request.BookRequestDto;
 import com.programming.bookservice.dto.response.BookResponseDto;
 import com.programming.bookservice.dto.response.CategoryResponseDto;
@@ -41,8 +42,8 @@ public class BookController {
 
     @Operation(summary = "دریافت کتاب با استفاده از id")
     @GetMapping("/book-by-id")
-    public ResponseEntity<BookResponseDto> getBookById(@RequestParam Long id){
-        return ResponseEntity.ok(bookService.getBookById(id));
+    public ResponseEntity<ResponseMessageDto> getBookById(@RequestParam Long id){
+        return bookService.getBookById(id);
     }
 
     @Operation(summary = "دریافت لیست کتاب ها براساس دسته بندی")
@@ -63,4 +64,22 @@ public class BookController {
     public ResponseEntity<List<CategoryResponseDto>> getCategories(){
         return ResponseEntity.status(HttpStatus.OK).body(bookService.getCategories());
     }
+
+
+
+
+
+    @PostMapping(value = "/upload-image-book")
+    public ResponseEntity<ResponseMessageDto> uploadImage(@RequestParam("file") MultipartFile file, @RequestParam Long bookId){
+        return bookService.uploadImage(file,bookId);
+    }
+
+
+
+
+
+
+
+
+
 }
