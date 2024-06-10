@@ -2,9 +2,11 @@ package com.programming.orderservice.dto.response;
 
 import lombok.Builder;
 
+import java.util.List;
+
 @Builder
 public record InventoryResponseDto(
-        String skuCode,
-        boolean isInStock
+        List<Long> bookIds,
+        List<Boolean> isInStock
 ) {
 }

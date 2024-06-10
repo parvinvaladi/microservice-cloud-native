@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.programming.orderservice";
+
+message IsInStockRequestDto{
+  repeated int64 book_ids = 1;
+  repeated int32 quantities = 2;
+}
+
+message IsInStockGRPCResponse{
+  repeated int64 book_ids = 1;
+  repeated bool is_in_stock = 2;
+}
+
+service GRPCIsInStockService{
+  rpc IsInStock(IsInStockRequestDto) returns (IsInStockGRPCResponse) {};
+}

@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Entity
-@Table(name = "ORDER_SERVICE")
+@Table(name = "order_service_orders")
 @Data
 public class Order {
 
