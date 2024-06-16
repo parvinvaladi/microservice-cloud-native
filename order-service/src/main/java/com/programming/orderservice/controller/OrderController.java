@@ -40,6 +40,25 @@ public class OrderController {
         return orderService.getAll();
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @GetMapping("get-all-book-ids-ordered")
+    public ResponseEntity<ResponseMessageDto> getAllBookIdsOrdered(){
+       return orderService.getAllBookIdsOrdered();
+    }
+
     @PostMapping(value = "/remove")
     public ResponseEntity<ResponseMessageDto> remove(@RequestParam Long id){
         return orderService.remove(id);

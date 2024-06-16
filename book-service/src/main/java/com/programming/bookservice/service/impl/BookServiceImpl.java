@@ -62,8 +62,6 @@ public class BookServiceImpl implements BookService {
                 .category(category.get())
                 .build();
         Book saved = bookRepository.save(product);
-//        SaveBookResponseDto responseDto = new SaveBookResponseDto(saved.getId(), saved.getName());
-//        return responseDto;
         return ResponseEntity.status(HttpStatus.OK).body(ResponseMessageDto.builder()
                         .data(saved.getId())
                 .build());

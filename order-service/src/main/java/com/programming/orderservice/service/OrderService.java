@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 public interface OrderService {
     ResponseEntity<String> saveOrder(OrderItemRequestDto requestDto);
     ResponseEntity<ResponseMessageDto> getAll();
+    ResponseEntity<ResponseMessageDto> getAllBookIdsOrdered();
 
     ResponseEntity<ResponseMessageDto> changeQuantity(Long id, Integer quantity);
     ResponseEntity<ResponseMessageDto> remove(Long id);

@@ -25,6 +25,7 @@ public abstract class BaseEntity {
     @CreatedDate
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
+    @Column(name = "created_date",updatable = false)
     private Date createdDate;
 
     @CreatedBy

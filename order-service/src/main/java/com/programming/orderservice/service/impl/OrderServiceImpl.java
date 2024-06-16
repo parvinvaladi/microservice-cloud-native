@@ -5,6 +5,7 @@ import com.programming.orderservice.dto.ResponseMessageDto;
 import com.programming.orderservice.dto.request.InventoryRequestDto;
 import com.programming.orderservice.dto.request.OrderItemRequestDto;
 import com.programming.orderservice.dto.response.*;
+import com.programming.orderservice.projection.OrderItemProjection;
 import com.programming.orderservice.repository.OrderItemRepository;
 import com.programming.orderservice.repository.OrderRepository;
 import com.programming.orderservice.domain.OrderItem;
@@ -15,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -34,13 +35,10 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private WebClient webClient;
 
-    private final KafkaTemplate kafkaTemplate;
-
-    public OrderServiceImpl(OrderRepository orderRepository, OrderItemRepository orderItemRepository, BookServiceClientService bookServiceClientService, KafkaTemplate kafkaTemplate) {
+    public OrderServiceImpl(OrderRepository orderRepository, OrderItemRepository orderItemRepository, BookServiceClientService bookServiceClientService) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.bookServiceClientService = bookServiceClientService;
-        this.kafkaTemplate = kafkaTemplate;
     }
 
     @Override
@@ -100,6 +98,16 @@ public class OrderServiceImpl implements OrderService {
                         .message(HttpStatus.OK.toString())
                         .data(orderItemResponseDtos)
                         .status(HttpStatus.OK)
+                .build());
+    }
+
+    @Override
+    public ResponseEntity<ResponseMessageDto> getAllBookIdsOrdered() {
+        List<OrderItemProjection> allProjections = orderItemRepository.findAllProjections();
+        return ResponseEntity.ok(ResponseMessageDto.builder()
+                .message(HttpStatus.OK.toString())
+                .data(allProjections)
+                .status(HttpStatus.OK)
                 .build());
     }
 

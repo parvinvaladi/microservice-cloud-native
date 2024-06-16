@@ -18,7 +18,6 @@ import java.util.Date;
 @Data
 public class Book extends BaseEntity {
 
-//    ,generator = "PRODUCT_SERVICE_SEQ"
     @Id
     @Column(name = "PID", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
