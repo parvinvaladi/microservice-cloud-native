@@ -39,7 +39,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Long saveProduct(BookRequestDto requestDto) {
+    public ResponseEntity<ResponseMessageDto> saveProduct(BookRequestDto requestDto) {
         log.info(String.valueOf(requestDto));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
         Date date;
@@ -48,19 +48,25 @@ public class BookServiceImpl implements BookService {
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
-        Category category = categoryRepository.findById(requestDto.categoryId());
+        Optional<Category> category = categoryRepository.findById(requestDto.categoryId());
+        if (category.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseMessageDto.builder().status(HttpStatus.NOT_FOUND)
+                    .message(HttpStatus.NOT_FOUND.name())
+                    .build());
         Book product = Book.builder()
                 .name(requestDto.name())
                 .publisherName(requestDto.publisherName())
                 .publishDate(date)
                 .description(requestDto.description())
                 .price(requestDto.price())
-                .category(category)
+                .category(category.get())
                 .build();
         Book saved = bookRepository.save(product);
 //        SaveBookResponseDto responseDto = new SaveBookResponseDto(saved.getId(), saved.getName());
 //        return responseDto;
-        return saved.getId();
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseMessageDto.builder()
+                        .data(saved.getId())
+                .build());
     }
 
     @Override
@@ -97,15 +103,23 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<BookResponseDto> getBooksByCategory(Long categoryId) {
+    public ResponseEntity<ResponseMessageDto> getBooksByCategory(Long categoryId) {
+        Optional<Category> categoryById = categoryRepository.findById(categoryId);
+        if (categoryById.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseMessageDto.builder().status(HttpStatus.NOT_FOUND)
+                    .message(HttpStatus.NOT_FOUND.name())
+                    .build());
         List<Book> products = bookRepository.findAllByCategoryId(categoryId);
         List<BookResponseDto> responseDtos = products.stream().map(product -> BookResponseDto.builder()
                 .id(product.getId())
                 .name(product.getName())
+                .categoryId(categoryById.get().getId())
                 .description(product.getDescription())
                 .price(product.getPrice())
                 .build()).collect(Collectors.toList());
-        return responseDtos;
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseMessageDto.builder()
+                .data(responseDtos)
+                .build());
     }
 
     @Override
@@ -143,18 +157,23 @@ public class BookServiceImpl implements BookService {
     @Override
     public ResponseEntity<ResponseMessageDto> uploadImage(MultipartFile file, Long bookId) {
         Optional<Book> bookOptional;
+        byte [] byteImage;
         try {
-            byte [] content = file.getBytes();
+            byteImage = file.getBytes();
             bookOptional = bookRepository.getById(bookId);
             if (bookOptional.isEmpty())
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseMessageDto.builder().status(HttpStatus.NOT_FOUND)
-                                .message("not found")
+                                .message(HttpStatus.NOT_FOUND.name())
                         .build());
-            log.info(Arrays.toString(content));
+            log.info(Arrays.toString(byteImage));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         Book book = bookOptional.get();
-        return null;
+        book.setImage(byteImage);
+        bookRepository.save(book);
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseMessageDto.builder()
+                        .status(HttpStatus.NOT_FOUND)
+                .build());
     }
 }

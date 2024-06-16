@@ -14,9 +14,9 @@ import java.util.List;
 public interface BookService {
 
 //    SaveBookResponseDto saveProduct(BookRequestDto requestDto);
-    Long saveProduct(BookRequestDto requestDto);
+    ResponseEntity<ResponseMessageDto> saveProduct(BookRequestDto requestDto);
     List<BookResponseDto> getAll();
-    List<BookResponseDto> getBooksByCategory(Long categoryId);
+    ResponseEntity<ResponseMessageDto> getBooksByCategory(Long categoryId);
     String upload(MultipartFile file);
     List<CategoryResponseDto> getCategories();
 

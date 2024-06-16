@@ -48,6 +48,9 @@ public class Book extends BaseEntity {
     @JoinColumn(name = "FK_BOOK_CATEGORY")
     private Category category;
 
+    @Transient
+    private Long categoryId;
+
     @Column(name = "BOOK_IMAGE")
     private byte[] image;
 }

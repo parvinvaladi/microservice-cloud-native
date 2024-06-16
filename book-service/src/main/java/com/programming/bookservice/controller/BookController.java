@@ -29,8 +29,8 @@ public class BookController {
 
     @PostMapping(value = "/save-book")
     @Operation(summary = "ذخیره کتاب جدید")
-    public ResponseEntity saveBook(@RequestBody BookRequestDto requestDto){
-        return ResponseEntity.ok(bookService.saveProduct(requestDto));
+    public ResponseEntity<ResponseMessageDto> saveBook(@RequestBody BookRequestDto requestDto){
+        return bookService.saveProduct(requestDto);
     }
 
     @Operation(summary = "دریافت لیست کتاب ها")
@@ -49,8 +49,8 @@ public class BookController {
     @Operation(summary = "دریافت لیست کتاب ها براساس دسته بندی")
     @GetMapping("/books-by-category")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<BookResponseDto>> getBooksByCategory(@RequestParam Long categoryId){
-        return ResponseEntity.ok(bookService.getBooksByCategory(categoryId));
+    public ResponseEntity<ResponseMessageDto> getBooksByCategory(@RequestParam Long categoryId){
+        return bookService.getBooksByCategory(categoryId);
     }
 
     @PostMapping("/upload-and-save-books")

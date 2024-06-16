@@ -4,12 +4,14 @@ import com.programming.bookservice.domain.Book;
 import com.programming.bookservice.domain.Category;
 import com.programming.bookservice.repository.CategoryRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class CategoryRepositoryImpl implements CategoryRepository {
@@ -23,9 +25,13 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     }
 
     @Override
-    public Category findById(Long id) {
+    public Optional<Category> findById(Long id) {
         Session session = entityManager.unwrap(Session.class);
-        Category category = session.createQuery("FROM Category WHERE id = :id",Category.class).setParameter("id",id).getSingleResult();
-        return category;
+        try {
+            Category category = session.createQuery("FROM Category WHERE id = :id",Category.class).setParameter("id",id).getSingleResult();
+            return Optional.of(category);
+        }catch (NoResultException e){
+            return Optional.empty();
+        }
     }
 }
