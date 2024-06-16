@@ -85,8 +85,7 @@ public class ExcelUtility {
                             book.setPrice(BigDecimal.valueOf(currentCell.getNumericCellValue()));
                             break;
                         case 6:
-                            Category byId = categoryRepository.findById((long) currentCell.getNumericCellValue());
-                            book.setCategory(byId);
+                            book.setCategoryId((long) currentCell.getNumericCellValue());
                         default:
                             break;
                     }

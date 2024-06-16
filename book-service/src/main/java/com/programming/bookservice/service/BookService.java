@@ -17,7 +17,7 @@ public interface BookService {
     ResponseEntity<ResponseMessageDto> saveProduct(BookRequestDto requestDto);
     List<BookResponseDto> getAll();
     ResponseEntity<ResponseMessageDto> getBooksByCategory(Long categoryId);
-    String upload(MultipartFile file);
+    ResponseEntity<ResponseMessageDto> upload(MultipartFile file);
     List<CategoryResponseDto> getCategories();
 
     ResponseEntity<ResponseMessageDto> getBookById(Long id);

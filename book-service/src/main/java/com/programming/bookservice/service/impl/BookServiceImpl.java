@@ -110,6 +110,8 @@ public class BookServiceImpl implements BookService {
                     .message(HttpStatus.NOT_FOUND.name())
                     .build());
         List<Book> products = bookRepository.findAllByCategoryId(categoryId);
+
+        Book build = Book.builder().build();
         List<BookResponseDto> responseDtos = products.stream().map(product -> BookResponseDto.builder()
                 .id(product.getId())
                 .name(product.getName())
@@ -123,24 +125,38 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public String upload(MultipartFile file) {
+    public ResponseEntity<ResponseMessageDto> upload(MultipartFile file) {
         log.info("upload started");
         String message = "";
         if (!ExcelUtility.hasExcelFormat(file)){
-            message = "The Excel file is not upload: " + file.getOriginalFilename() + "!";
-            return message;
+            message = "The Excel file is should be in xlsx format: " + file.getOriginalFilename() + "!";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseMessageDto.builder().status(HttpStatus.NOT_FOUND)
+                    .message(message)
+                    .build());
         }
 
         try {
             ExcelUtility.setCategoryRepository(categoryRepository);
             List<Book> bookList = ExcelUtility.excelToBookList(file.getInputStream());
-            List<Book> books = bookRepository.findAll();
-            bookList.forEach(bookRepository::save);
+
+            for (Book book: bookList){
+                Optional<Category> categoryOptional = categoryRepository.findById(book.getCategoryId());
+                if (categoryOptional.isEmpty())
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseMessageDto.builder().status(HttpStatus.NOT_FOUND)
+                            .message(HttpStatus.NOT_FOUND.name())
+                            .build());
+                Category category = categoryOptional.get();
+                book.setCategory(category);
+                bookRepository.save(book);
+            }
+
             message = "The Excel file is uploaded: " + file.getOriginalFilename();
         } catch (IOException e) {
             throw new RuntimeException("Please upload a valid Excel file!");
         }
-        return message;
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseMessageDto.builder().status(HttpStatus.OK)
+                .message(message)
+                .build());
     }
 
     @Override

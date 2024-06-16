@@ -3,12 +3,13 @@ package com.programming.bookservice.domain;
 import com.programming.bookservice.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
 @Entity
 @Table(name = "book_service_category")
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter

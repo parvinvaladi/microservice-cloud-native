@@ -55,8 +55,8 @@ public class BookController {
 
     @PostMapping("/upload-and-save-books")
     @Operation(summary = "بارگذاری فایل اکسل و ذخیره کتاب ها")
-    public ResponseEntity<String> upload(@RequestParam("file")MultipartFile file){
-        return ResponseEntity.status(HttpStatus.OK).body(bookService.upload(file));
+    public ResponseEntity<ResponseMessageDto> upload(@RequestParam("file")MultipartFile file){
+        return bookService.upload(file);
     }
 
     @GetMapping("/get-categories")
