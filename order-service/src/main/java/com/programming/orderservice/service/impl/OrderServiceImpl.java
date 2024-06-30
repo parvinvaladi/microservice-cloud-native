@@ -18,6 +18,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
@@ -42,9 +44,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ResponseEntity<String> saveOrder(OrderItemRequestDto orderRequestDto) {
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<ResponseMessageDto> saveOrder(OrderItemRequestDto orderRequestDto) {
 
+        try {
+            ResponseEntity<ResponseMessageDto> bookById = bookServiceClientService.getById(orderRequestDto.bookId());
 
+            if (bookById.getStatusCode() == HttpStatus.NOT_FOUND || bookById.getBody().getData() == null){
+                throw new Exception("not found");
+            }
         InventoryRequestDto inventoryRequestDto = InventoryRequestDto.builder()
                 .bookIds(List.of(orderRequestDto.bookId()))
                 .quantities(List.of(orderRequestDto.quantity()))
@@ -66,22 +74,64 @@ public class OrderServiceImpl implements OrderService {
                         .bookId(orderRequestDto.bookId())
                         .quantity(orderRequestDto.quantity())
                         .build();
-                orderItemRepository.save(orderItem);
+                OrderItem saved = orderItemRepository.save(orderItem);
 //                kafkaTemplate.send("notificationTopic", new OrderPlacedEvent(order.getOrderNumber()));
-                return ResponseEntity.ok("");
+                return ResponseEntity.status(HttpStatus.CREATED)
+                        .body(ResponseMessageDto.builder()
+                                .status(HttpStatus.CREATED)
+                                .message("saved")
+                                .data(orderItem)
+                                .build());
             }else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not all books in stock");
+                throw new Exception("not in stock");
             }
+
+        }catch (Exception e){
+            log.error(e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ResponseEntity.badRequest().body(ResponseMessageDto.builder()
+                            .status(HttpStatus.NOT_FOUND)
+                            .message("not found")
+                    .build());
+        }
+//        InventoryRequestDto inventoryRequestDto = InventoryRequestDto.builder()
+//                .bookIds(List.of(orderRequestDto.bookId()))
+//                .quantities(List.of(orderRequestDto.quantity()))
+//                .build();
+//
+//        InventoryResponseDto inventoryResponseDto = webClient.post()
+//                .uri("http://localhost:8081/api/v1/inventory/is-in-stock")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .bodyValue(inventoryRequestDto)
+//                .retrieve()
+//                .toEntity(InventoryResponseDto.class)
+//                .block()
+//                .getBody();
+//
+//        boolean allBooksInStock = !inventoryResponseDto.isInStock().contains(false);
+//
+//            if (allBooksInStock){
+//                OrderItem orderItem = OrderItem.builder()
+//                        .bookId(orderRequestDto.bookId())
+//                        .quantity(orderRequestDto.quantity())
+//                        .build();
+//                orderItemRepository.save(orderItem);
+////                kafkaTemplate.send("notificationTopic", new OrderPlacedEvent(order.getOrderNumber()));
+//                return ResponseEntity.ok("");
+//            }else {
+//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not all books in stock");
+//            }
+
     }
 
     @Override
     public ResponseEntity<ResponseMessageDto> getAll() {
         List<OrderItem> orders = orderItemRepository.findAll();
-        BookResponseDto bookResponseDto = null;
+        ResponseMessageDto bookResponseDto = null;
         for (OrderItem order : orders) {
             bookResponseDto =  bookServiceClientService.getById(order.getId()).getBody();
         }
-        BookResponseDto finalBookResponseDto = bookResponseDto;
+        BookResponseDto finalBookResponseDto = (BookResponseDto) bookResponseDto.getData();
         List<OrderItemResponseDto> orderItemResponseDtos = orders.stream().map(order -> OrderItemResponseDto.builder()
                 .id(order.getId())
                 .bookId(order.getBookId())
@@ -103,7 +153,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public ResponseEntity<ResponseMessageDto> getAllBookIdsOrdered() {
-        List<OrderItemProjection> allProjections = orderItemRepository.findAllProjections();
+//        List<OrderItemProjection> allProjections = orderItemRepository.findAllProjections();
+        List<OrderItemResponseProjectionDto> allProjections = orderItemRepository.findAllProjectionsByDto();
         return ResponseEntity.ok(ResponseMessageDto.builder()
                 .message(HttpStatus.OK.toString())
                 .data(allProjections)

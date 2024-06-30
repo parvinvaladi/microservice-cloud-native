@@ -11,5 +11,5 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface BookServiceClientService {
 
     @GetMapping("/book-by-id")
-    ResponseEntity<BookResponseDto> getById(@RequestParam Long id);
+    ResponseEntity<ResponseMessageDto> getById(@RequestParam Long id);
 }

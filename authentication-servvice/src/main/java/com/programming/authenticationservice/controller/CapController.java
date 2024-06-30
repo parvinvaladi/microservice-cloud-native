@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/authentication")
+@CrossOrigin
 public class CapController {
 
     private final CapService capService;

@@ -16,6 +16,7 @@ import java.util.concurrent.CompletableFuture;
 @RestController
 @RequestMapping(value = "/order")
 @RequiredArgsConstructor
+@CrossOrigin
 public class OrderController {
 
     private final OrderService orderService;
@@ -26,7 +27,7 @@ public class OrderController {
 //    @CircuitBreaker(name = "inventory",fallbackMethod = "fallbackMethod")
 //    @TimeLimiter(name = "inventory")
 //    @Retry(name = "inventory")
-    public ResponseEntity<String> saveOrder(@RequestBody OrderItemRequestDto requestDto){
+    public ResponseEntity<ResponseMessageDto> saveOrder(@RequestBody OrderItemRequestDto requestDto){
         return orderService.saveOrder(requestDto);
     }
 

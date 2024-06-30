@@ -9,6 +9,7 @@ import com.programming.bookservice.service.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/v1/book")
+@CrossOrigin
 @Slf4j
 public class BookController {
 
@@ -53,9 +55,9 @@ public class BookController {
         return bookService.getBooksByCategory(categoryId);
     }
 
-    @PostMapping("/upload-and-save-books")
+    @PostMapping(value = "/upload-and-save-books", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     @Operation(summary = "بارگذاری فایل اکسل و ذخیره کتاب ها")
-    public ResponseEntity<ResponseMessageDto> upload(@RequestParam("file")MultipartFile file){
+    public ResponseEntity<ResponseMessageDto> upload(@RequestPart MultipartFile file){
         return bookService.upload(file);
     }
 

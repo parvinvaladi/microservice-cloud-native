@@ -11,6 +11,7 @@ import com.programming.bookservice.repository.BookRepository;
 import com.programming.bookservice.repository.CategoryRepository;
 import com.programming.bookservice.service.BookService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -79,8 +80,12 @@ public class BookServiceImpl implements BookService {
         return responseDtos;
     }
 
+    @Value("${test.config}")
+    private String nn;
+
     @Override
     public ResponseEntity<ResponseMessageDto> getBookById(Long id) {
+        log.info(nn);
         Optional<Book> bookOptional = bookRepository.getById(id);
         if (bookOptional.isEmpty())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseMessageDto.builder().status(HttpStatus.NOT_FOUND)
