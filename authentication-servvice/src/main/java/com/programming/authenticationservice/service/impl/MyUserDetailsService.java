@@ -30,29 +30,23 @@ import java.util.Set;
 public class MyUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
 
-    private final PasswordEncoder passwordEncoder;
-
-    @Autowired
-    public MyUserDetailsService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public MyUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
-        if (user == null)
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isEmpty())
             throw new UsernameNotFoundException("User not found");
         boolean accountNonExpired = true;
         boolean credentialsNonExpired = true;
         boolean accountNonLocked = true;
-        log.info(userRepository.findByIdWithRoles(user.getId()).toString());
-        Optional<List<String>> byIdWithRoles = userRepository.findByIdWithRoles(user.getId());
-        return new org.springframework.security.core.userdetails.User(username,user.getPassword(),user.isEnabled(),accountNonExpired,credentialsNonExpired,accountNonLocked,getAuthorities(byIdWithRoles.get()));
+        log.info(userRepository.findByIdWithRoles(user.get().getId()).toString());
+        Optional<List<String>> byIdWithRoles = userRepository.findByIdWithRoles(user.get().getId());
+        return new org.springframework.security.core.userdetails.User(username,user.get().getPassword(),user.get().isEnabled(),accountNonExpired,credentialsNonExpired,accountNonLocked,getAuthorities(byIdWithRoles.get()));
     }
 
     private static List<GrantedAuthority> getAuthorities (List<String> roleNames) {
@@ -63,18 +57,5 @@ public class MyUserDetailsService implements UserDetailsService {
         return authorities;
     }
 
-    public ResponseEntity<ResponseMessageDto> register(RegisterRequestDto requestDto){
-        Optional<Role> optionalRole = roleRepository.findByName("user");
-        if (optionalRole.isEmpty())
-            return (ResponseEntity<ResponseMessageDto>) ResponseEntity.notFound();
-        User user = User.builder()
-                .username(requestDto.userName())
-                .password(passwordEncoder.encode(requestDto.password()))
-                .enabled(true)
-                .roles(Set.of(optionalRole.get()))
-                .build();
-        userRepository.save(user);
-        return ResponseEntity.ok(ResponseMessageDto.builder().build());
-    }
 
 }

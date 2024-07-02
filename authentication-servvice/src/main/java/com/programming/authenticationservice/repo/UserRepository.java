@@ -16,5 +16,5 @@ public interface UserRepository extends JpaRepository<User,Long> {
             "JOIN authentication_service_role r ON ur.role_id = r.id " +
             "WHERE u.id = :id", nativeQuery = true)
     Optional<List<String>> findByIdWithRoles(@Param("id") Long id);
-    User findByUsername(String username);
+    Optional<User> findByUsername(String username);
 }

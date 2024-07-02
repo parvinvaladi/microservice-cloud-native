@@ -2,7 +2,7 @@ package com.programming.authenticationservice.controller;
 
 import com.programming.authenticationservice.dto.ResponseMessageDto;
 import com.programming.authenticationservice.dto.request.RegisterRequestDto;
-import com.programming.authenticationservice.service.impl.MyUserDetailsService;
+import com.programming.authenticationservice.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 
@@ -14,20 +14,16 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin
 public class UserController {
 
-    private final MyUserDetailsService myUserDetailsService;
+    private final UserService userService;
 
-    public UserController(MyUserDetailsService myUserDetailsService) {
-        this.myUserDetailsService = myUserDetailsService;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
+
 
     @PostMapping("/register")
     public ResponseEntity<ResponseMessageDto> register(@Valid @RequestBody RegisterRequestDto requestDto){
-        return myUserDetailsService.register(requestDto);
-    }
-
-    @GetMapping("/get-user-details")
-    public UserDetails getUserDetails(@RequestParam String userName){
-        return myUserDetailsService.loadUserByUsername(userName);
+        return userService.register(requestDto);
     }
 
 }
