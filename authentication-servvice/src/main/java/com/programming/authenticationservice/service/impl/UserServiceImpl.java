@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
         User user = User.builder()
                 .username(requestDto.userName())
                 .password(passwordEncoder.encode(requestDto.password()))
-                .enabled(false)
+                .enabled(true)
                 .roles(Set.of(optionalRole.get()))
                 .build();
         userRepository.save(user);
