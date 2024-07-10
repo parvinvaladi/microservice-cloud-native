@@ -70,6 +70,9 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<BookResponseDto> getAll() {
+        Optional<Category> byIdWithBook = categoryRepository.findByIdWithBook(0L);
+        List<Book> books = byIdWithBook.get().getBooks();
+
         List<Book> products = bookRepository.findAll();
         List<BookResponseDto> responseDtos = products.stream().map(product -> BookResponseDto.builder()
                 .id(product.getId())
@@ -86,7 +89,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public ResponseEntity<ResponseMessageDto> getBookById(Long id) {
         log.info(nn);
-        Optional<Book> bookOptional = bookRepository.getById(id);
+        Optional<Book> bookOptional = bookRepository.findById(id);
         if (bookOptional.isEmpty())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseMessageDto.builder().status(HttpStatus.NOT_FOUND)
                     .message("not found")
@@ -163,9 +166,13 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    @Cacheable(value = "cache")
+//    @Cacheable(value = "cache")
     public List<CategoryResponseDto> getCategories() {
         List<Category> categories = categoryRepository.findAll();
+        categories.forEach(category -> {
+            List<Book> books = category.getBooks();
+            log.info(books.toString());
+        });
         return categories.stream().map(category -> CategoryResponseDto.builder()
                 .id(category.getId())
                 .name(category.getName())
@@ -179,7 +186,7 @@ public class BookServiceImpl implements BookService {
         byte [] byteImage;
         try {
             byteImage = file.getBytes();
-            bookOptional = bookRepository.getById(bookId);
+            bookOptional = bookRepository.findById(bookId);
             if (bookOptional.isEmpty())
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseMessageDto.builder().status(HttpStatus.NOT_FOUND)
                                 .message(HttpStatus.NOT_FOUND.name())

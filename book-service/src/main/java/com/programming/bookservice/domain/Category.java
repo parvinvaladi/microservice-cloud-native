@@ -4,6 +4,9 @@ import com.programming.bookservice.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.util.List;
 
@@ -29,7 +32,9 @@ public class Category extends BaseEntity {
     @Lob
     private String description;
 
-    @OneToMany(cascade = CascadeType.ALL,targetEntity = Book.class,mappedBy = "category")
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,targetEntity = Book.class,mappedBy = "category")
+//    @BatchSize(size = 4)
+//    @Fetch(FetchMode.SUBSELECT)
     private List<Book> books;
 
 }

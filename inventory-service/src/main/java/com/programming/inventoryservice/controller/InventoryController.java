@@ -4,6 +4,7 @@ import com.programming.inventoryservice.common.InventoryPageDto;
 import com.programming.inventoryservice.dto.request.IsInStockRequestDto;
 import com.programming.inventoryservice.dto.response.IsInStockResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import com.programming.inventoryservice.dto.InventoryDto;
 import com.programming.inventoryservice.dto.request.SaveToInventoryRequestDto;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,7 +34,7 @@ public class InventoryController {
 
     @PostMapping(value = "/update-inventory")
     @Operation(summary = "آپدیت تعداد کتاب موجودی")
-    public ResponseEntity saveToInventory(@RequestBody InventoryDto requestDto){
+    public ResponseEntity saveToInventory(@Valid @RequestBody InventoryDto requestDto){
         return inventoryService.saveToInventory(requestDto);
     }
 
@@ -46,7 +48,7 @@ public class InventoryController {
     @PostMapping(value = "/is-in-stock")
     @Operation(summary = "وجود یا عدم وجود در انبار")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<IsInStockResponseDto> isInStock(@RequestBody IsInStockRequestDto requestDto, HttpServletRequest request){
+    public ResponseEntity<IsInStockResponseDto> isInStock(@Valid @RequestBody IsInStockRequestDto requestDto, HttpServletRequest request){
         log.info(String.valueOf(request));
         return ResponseEntity.ok(inventoryService.isInStock(requestDto));
     }

@@ -43,11 +43,18 @@ public class UserServiceImpl implements UserService {
         User user = User.builder()
                 .username(requestDto.userName())
                 .password(passwordEncoder.encode(requestDto.password()))
+                .lastName(requestDto.lastName())
+                .gender(requestDto.gender())
+                .firstName(requestDto.firstName())
                 .enabled(true)
+                .email(requestDto.email())
                 .roles(Set.of(optionalRole.get()))
                 .build();
         userRepository.save(user);
-        return ResponseEntity.ok(ResponseMessageDto.builder().build());
+        return ResponseEntity.ok(ResponseMessageDto.builder()
+                        .message(HttpStatus.CREATED.name())
+                        .status(HttpStatus.CREATED)
+                .build());
     }
 
 }
