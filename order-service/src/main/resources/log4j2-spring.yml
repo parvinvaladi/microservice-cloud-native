@@ -1,0 +1,42 @@
+Configuration:
+  status: warn
+
+  properties:
+    property:
+      name: log-name
+      value: ${spring:spring.application.name}.log
+
+  appenders:
+    console:
+      name: LogToConsole
+      target: SYSTEM_OUT
+      PatternLayout:
+        pattern: "%style{%X{serviceName}}{bright,green}@%style{%X{hostName}}{bright,blue}#%style{%X{threadName}}{bright,yellow}  %style{%X{ipAddress}}{bright,red}   [%highlight{%-5level}]%style{%-26c{1}.%-29M}{blue}:%-4L: %msg%n%throwable"
+
+    RollingFile:
+      - name: LogToRollingFile
+        fileName: ./.log/${log-file-name}
+        filePattern: "/var/log/shahrtech/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz"
+        PatternLayout:
+          pattern: "%X{serviceName}@%X{hostName}#%X{threadName}  %d  %-15X{ipAddress} [%-5p]%-26c{1}.%-29M:%-4L: %msg%n%throwable"
+        Policies:
+          SizeBasedTriggeringPolicy:
+            size: 100MB
+        DefaultRollOverStrategy:
+          max: 1000
+
+  Loggers:
+    logger:
+      - name: com.programming
+        level: debug
+        additivity: false
+        AppenderRef:
+          - ref: LogToConsole
+          - ref: LogToRollingFile
+
+    Root:
+      level: debug
+      additivity: false
+      AppenderRef:
+        - ref: LogToConsole
+        - ref: LogToRollingFile

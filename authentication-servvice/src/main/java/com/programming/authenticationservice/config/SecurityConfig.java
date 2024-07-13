@@ -30,8 +30,8 @@ public class SecurityConfig {
         http.csrf().disable()
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/authentication/evaluate","/authentication/kapcha","/authentication/register", "/authentication/get-user-details", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                                .requestMatchers("/authentication/save-role/**").hasRole("SUPER_ADMIN")
+                                .requestMatchers("/authentication/save-role/**","/authentication/evaluate","/authentication/kapcha","/authentication/register", "/authentication/get-user-details", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+//                                .requestMatchers("/authentication/save-role/**").hasRole("SUPER_ADMIN")
                                 .anyRequest().authenticated()
                 )
                 .formLogin(formLogin ->
