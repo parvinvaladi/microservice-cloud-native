@@ -28,6 +28,4 @@ public class Inventory {
     @Column(name = "LAST_RESTOCKED_DATE")
     private Date lastRestockedDate;
 
-    @Column(name = "LOCATION")
-    private String location;
 }

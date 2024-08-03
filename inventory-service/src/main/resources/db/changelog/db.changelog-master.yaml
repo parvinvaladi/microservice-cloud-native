@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: parvin
+      changes:
+        - createTable:
+            tableName: inventory_service_inventory
+            columns:
+              - column:
+                  name: PID
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: BOOK_ID
+                  type: BIGINT
+              - column:
+                  name: QUANTITY
+                  type: INTEGER
+              - column:
+                  name: LAST_RESTOCKED_DATE
+                  type: TIMESTAMP
